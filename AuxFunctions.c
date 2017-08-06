@@ -7,7 +7,7 @@
 
 
 
-/*Bool Function that checks if the label is valid by return boolean value, if will be an error the function will insert the match error into ErrorsAssembler table */
+/*Bool Function that ppp checks if the label is valid by return boolean value, if will be an error the function will insert the match error into ErrorsAssembler table */
 int isValidLabel(char * label)
 {
     
