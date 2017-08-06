@@ -28,6 +28,4 @@ void insertToDT(char **data,int Instruc_type);
 
 /*Update the given instruction command for the second checking*/
 void updateInstruction(char **data,int Instruc_type);
-
-int isGoodLetter (char toTest);
 #endif /* AuxFunctions_h */
