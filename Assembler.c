@@ -142,25 +142,24 @@ void FirstCheckingCommand(char ** command)
 {
     int flag_symbol_type;
 
-    if (isLabel(command[0]))
-    {
+   
         /*In the case that the first string on the current command line is a label(symbol) */
-        if((isValidLabel(command[0]))&&((flag_symbol_type=isInstruction(command[1])>=0)))
-        {
+    if((isValidLabel(command[0]))&&((flag_symbol_type=isInstruction(command[1])>=0)))
+     {
             /*if the instrct type is an data*/
             if((flag_symbol_type>15)&&(flag_symbol_type<19))
             {
-                insertSymbolToTable(@command[0],flag_symbol_type);
+                insertSymbolToTable(&command[0],flag_symbol_type);
                 insertToDT(&command[2],flag_symbol_type);
             }
             /*if the instrct type is an instruction*/
            else if(flag_symbol_type<=15)
             {
-                insertSymbolToTable(@command[0],flag_symbol_type);
+                insertSymbolToTable(&command[0],flag_symbol_type);
                 insertToIT(&command[2],flag_symbol_type);   /*the command[2] is first operand*/
             }           
-        }
-    }
+     }
+    
     else /*if the commands[0] isn't label*/
     {
         if ((flag_symbol_type=isInstruction(command[0]))>=0)
