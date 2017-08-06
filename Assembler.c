@@ -18,7 +18,7 @@ unsigned word_counter;
 FILE * fd;                           /*FILE pointer to the given assembly file*/
 
 
-/*fucntion that checks if the new memory allocate was successed, if not the function will print to stderr a new error message and then will exit the program*/
+/*fucnt48ion that checks if the new memory allocate was successed, if not the function will print to stderr a new error message and then will exit the program*/
 void allocate_check(void * p)
 {
     if(!p)
