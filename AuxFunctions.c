@@ -105,6 +105,7 @@ int isInstruction(char * order)
         return 20;
     }
 
+    insertNewError(order);
     return -1
 }
 
