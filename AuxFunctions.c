@@ -10,7 +10,25 @@
 /*Bool Function that ppp checks if the label is valid by return boolean value, if will be an error the function will insert the match error into ErrorsAssembler table */
 int isValidLabel(char * label)
 {
-    
+        int i = strlen(label);
+    if(i>30) return 0;
+    int k;
+    if ((int)label[0]>= 48 && (int)label[0]<=57)
+        return 0;
+    for ( k = 0; k < i-2; k++) {
+        if (!isGoodLetter(label[k]))
+        {
+            return 0;
+        }
+    }
+
+    k++;
+    if (label[k]!=':')
+    {
+        return 0;
+    }
+
+    return 1;
 }
 
 
