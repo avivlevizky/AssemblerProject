@@ -18,34 +18,36 @@ int isGoodLetter (char toTest){
 /*Bool Function that ppp checks if the label is valid by return boolean value, if will be an error the function will insert the match error into ErrorsAssembler table */
 int isValidLabel(char * label)
 {
-    int i;
+    int flag;             /*flag=0 is not valid label; flag=1 is valid label */
+    size_t i;
     i= strlen(label);
-    if(i>30) return 0;
-    int k;
-    if ((int)label[0]>= 48 && (int)label[0]<=57)
-        return 0;
-    for ( k = 0; k < i-2; k++) {
-        if (!isGoodLetter(label[k]))
-        {
-            return 0;
-        }
-    }
+    flag=1;
     
-    k++;
-    if (label[k]!=':')
+    if(isInstruction>=0)
+        flag=0;
+    else
     {
-        return 0;
+        if(i>30) flag=0;
+        int k;
+        if ((int)label[0]>= 48 && (int)label[0]<=57)
+            return 0;
+        for ( k = 0; k < i-2; k++)
+        {
+            if (!isGoodLetter(label[k]))
+                flag=0;
+        }
+        k++;
+        if (label[k]!=':')
+            flag=0;
     }
     
-    return 1;
+    if (!flag)
+    {
+        insertNewError("Invalid Label in line: ");
+    }
+     return flag;
 }
 
-
-/*Bool Function that check if the first string from the command line is a lavel or not*/
-int isLabel(char * order)
-{
-    
-}
 
 
 
@@ -116,12 +118,12 @@ int isInstruction(char * order)
         return 20;
     }
     
-    insertNewError("");
+    insertNewError("Invalid instructions");
     return -1;
 }
 
 /*Function that insert the symbol into the symbols tabel by the type: 16 or 17 or 18 is data;19 is .entry and 20 is .extern otherwise is instruction type. and update SC counter too*/
-void insertSymbolToTable(char **data,int type)
+void insertSymbolToTable(char *data,int type)
 {
     
     
@@ -147,9 +149,6 @@ void insertToDT(char **data,int Instruc_type)
 /*Update the given instruction command for the second checking*/
 void updateInstruction(char **data,int Instruc_type)
 {
-    
-    
-    
     
     
 }

@@ -40,6 +40,9 @@ void allocate_check(void * p)
 /*fucntion that insert new assembler error into ErrorsAssembler table */
 void insertNewError(char * error)
 {
+    char temp [1024];
+    sprintf(temp, error, LC); // puts string into buffer
+
     if (!EC)
     {
         ErrorsAssembler=(char **)calloc(1, sizeof(char *));
@@ -52,6 +55,9 @@ void insertNewError(char * error)
     allocate_check((char *)ErrorsAssembler[EC]);
     
 }
+
+
+
 
 /*function that free the linked list of strings*/
 void freeLinkedList(char ** list)
@@ -154,13 +160,13 @@ void FirstCheckingCommand(char ** command)
         /*if the instrct type is an data*/
         if((flag_symbol_type>15)&&(flag_symbol_type<19))
         {
-            insertSymbolToTable(&command[0],flag_symbol_type);
+            insertSymbolToTable(command[0],flag_symbol_type);
             insertToDT(&command[2],flag_symbol_type);
         }
         /*if the instrct type is an instruction*/
         else if(flag_symbol_type<=15)
         {
-            insertSymbolToTable(&command[0],flag_symbol_type);
+            insertSymbolToTable(command[0],flag_symbol_type);
             insertToIT(&command[2],flag_symbol_type);   /*the command[2] is first operand*/
         }
     }
@@ -172,7 +178,7 @@ void FirstCheckingCommand(char ** command)
             if (flag_symbol_type>=19)
             {
                 if(flag_symbol_type==20) /*if is .extern insruct type then we will enter the command into the symbol table*/
-                    insertSymbolToTable(&command[1],flag_symbol_type);
+                    insertSymbolToTable(command[1],flag_symbol_type);
             }
             else
             {
@@ -198,7 +204,7 @@ void SecondCheckingCommand(char ** command)
     if((flag_symbol_type=isInstruction(command[flag]))==19)
     {
         /*In the case that the second string is .entry*/
-        insertSymbolToTable(&command[0],flag_symbol_type);   /*need to assign the current label(symbol) as an .entry in the symbol table*/
+        insertSymbolToTable(command[0],flag_symbol_type);   /*need to assign the current label(symbol) as an .entry in the symbol table*/
     }
     else if(flag_symbol_type<=15)
     {
@@ -247,6 +253,7 @@ int main(int argc,char ** argv) {
     }
     
     return 0;
+    
     
     
     
