@@ -98,6 +98,12 @@ int isInstruction(char * order)
     if (strcmp(order,".mat")==0){
         return 18;
     }
+     if (strcmp(order,".entry")==0){
+        return 19;
+    }
+     if (strcmp(order,".extern")==0){
+        return 20;
+    }
 
     return -1
 }
