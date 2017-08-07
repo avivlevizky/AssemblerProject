@@ -3,7 +3,8 @@
 #include <string.h>
 #include <stdio.h>
 #include "Assembler.h"
-#include "AuxFunctions.h"
+#include "Checkers.h"
+#include "Insertion.h"
 
 
 extern Symbol ** symbol_table;               /*The symbols table*/
