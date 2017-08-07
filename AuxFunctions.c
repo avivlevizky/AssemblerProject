@@ -6,6 +6,8 @@
 
 #include <stdio.h>
 
+
+/*Private Aux function: which indicate if the given char is an alpha-bet charcter*/
 int isGoodLetter (char toTest){
     
     int tester = (int)toTest;
@@ -13,6 +15,20 @@ int isGoodLetter (char toTest){
     {return 1;}
     return 0;
 }
+
+
+/*Private Aux function: search and return the place of the given label from the symbol table*/
+int findDataInstruction(char * data){
+    
+}
+
+
+
+
+
+
+/*******************************************************************************************************************************/
+
 
 
 /*Bool Function that ppp checks if the label is valid by return boolean value, if will be an error the function will insert the match error into ErrorsAssembler table */
@@ -43,7 +59,7 @@ int isValidLabel(char * label)
     
     if (!flag)
         insertNewError("Invalid Label in line: ");
-     return flag;
+    return flag;
 }
 
 
@@ -133,7 +149,7 @@ void insertSymbolToTable(char *data,int type)
 void insertToIT(char **data,int Instruc_type)
 {
     
-    
+     
     
     
 }
