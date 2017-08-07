@@ -29,6 +29,8 @@ typedef struct
 
 
 void insertNewError(char * error);
+void allocate_check(void * p);
+
 
 
 

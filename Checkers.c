@@ -160,27 +160,61 @@ int checkAddressingType(char * data)
           if((reader=='r')&&((value<0)||(value>7))) /*if the operand is reg and the domain value is out of bounds-> return -1*/
               return -1;
 
-          //(reader=='#') ? (return 0) : (return 3);
+          return (reader=='#') ? 0 : 3;
       }
-      if(reader=='r')
-      {
-          int value;
-          value=atoi((data+1));
-          
-      }
-        
     }
     
-    
-    
-    
-    return 0;
+    return -1;
 
 }
 
 
 
+char ** isValidMatrix(char * mat)
+{
+    char ** matFixed;           /*dynamic matrix of strings*/
+    int openB,closeB,wordCounter;
+    char * reader;
+    char barak [2];
+    
+    matFixed=NULL;
+    barak[0]='[';
+    reader='\0';
+    openB=0;
+    closeB=0;
+    wordCounter=1;
+    reader=strtok(mat,barak);
+    if(!isValidLabel(reader))
+        return matFixed;
+    
+    matFixed=(char **)malloc(sizeof(char *));
+    allocate_check(matFixed);
+    matFixed[0]=reader;
+    barak[0]=']';
+    
+    while((reader=strtok(NULL,barak))!=NULL)
+    {
+        if(checkAddressingType(reader)==3)
+        {
+            matFixed=(char **)realloc(matFixed,(wordCounter+1)*sizeof(char *));
+            matFixed[wordCounter]=reader;
+            reader++;
+            barak[0]='[';
+        }
+        else
+        {
+            insertNewError("Invalid register index in line: ");
+            
+        }
+        
+    }
 
+    
+    
+    
+    
+    return 0;
+}
 
 
 
