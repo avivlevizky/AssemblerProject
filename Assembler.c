@@ -155,7 +155,7 @@ void FirstCheckingCommand(char ** command)
     
     
     /*In the case that the first string on the current command line is a label(symbol) */
-    if((isValidLabel(command[0]))&&((flag_symbol_type=isInstruction(command[1])>=0)))
+    if((isValidLabel(command[0]))&&((flag_symbol_type=isInstruction(command[1],1)>=0)))
     {
         /*if the instrct type is an data*/
         if((flag_symbol_type>15)&&(flag_symbol_type<19))
@@ -173,7 +173,7 @@ void FirstCheckingCommand(char ** command)
     
     else /*if the commands[0] isn't label*/
     {
-        if ((flag_symbol_type=isInstruction(command[0]))>=0)
+        if ((flag_symbol_type=isInstruction(command[0],1))>=0)
         {
             if (flag_symbol_type>=19)
             {
@@ -201,7 +201,7 @@ void SecondCheckingCommand(char ** command)
         flag=1;
     }
     
-    if((flag_symbol_type=isInstruction(command[flag]))==19)
+    if((flag_symbol_type=isInstruction(command[flag],1))==19)
     {
         /*In the case that the second string is .entry*/
         insertSymbolToTable(command[0],flag_symbol_type);   /*need to assign the current label(symbol) as an .entry in the symbol table*/
