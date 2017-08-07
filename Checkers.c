@@ -19,8 +19,6 @@ int isGoodLetter (char toTest){
 
 
 
-
-
 /*******************************************************************************************************************************/
 
 
@@ -133,10 +131,38 @@ int isInstruction(char * order, int flagMessage)
 }
 
 
-/*Function: search and return the place of the given label from the symbol table, if not exist return -1*/
-int findDataInstruction(char * data){
+/*Int Function: search and return the index of the given label from the symbol table, if not exist return -1*/
+int findDataInstruction(char * data)
+{
     
 }
+
+
+/*Boolean Function: check by the given string which type of addressing type it is*/
+int checkAddressingType(char * data)
+{
+    
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
