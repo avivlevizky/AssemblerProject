@@ -17,7 +17,7 @@ int isGoodLetter (char toTest){
 }
 
 
-/*Private Aux function: search and return the place of the given label from the symbol table*/
+/*Private Aux function: search and return the place of the given label from the symbol table, if not exist return -1*/
 int findDataInstruction(char * data){
     
 }
