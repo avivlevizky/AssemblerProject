@@ -47,6 +47,7 @@ unsigned SC;                 /*Symbol counter*/
 char ** ErrorsAssembler;     /*Error in the compiling*/
 unsigned EC;                 /*Error counter*/
 unsigned LC;                 /*Line counter*/
+unsigned DC;                 /*Data table counter*/
 
 
 

@@ -1,9 +1,7 @@
 
 #include "Checkers.h"
 #include "Assembler.h"
-
 #include <string.h>
-
 #include <stdio.h>
 
 
@@ -131,18 +129,53 @@ int isInstruction(char * order, int flagMessage)
 }
 
 
+
 /*Int Function: search and return the index of the given label from the symbol table, if not exist return -1*/
 int findDataInstruction(char * data)
 {
-    
+ 
+    return 0;
 }
 
 
-/*Boolean Function: check by the given string which type of addressing type it is*/
+
+
+/*Boolean Function: check of the given string which type of addressing type it is*/
 int checkAddressingType(char * data)
 {
+    int i;
+    char reader;
+    
+    i=0;
+    
+    while((reader=data[i])!='\0')
+    {
+      if((reader=='#')||(reader=='r'))
+      {
+          int value;
+          value=atoi((data+1));
+          
+          if((!value)&&(data[1]!='0')) /*if value ==0 and the next char after '#' isn't '0' then value is an error*/
+              return -1;
+          if((reader=='r')&&((value<0)||(value>7))) /*if the operand is reg and the domain value is out of bounds-> return -1*/
+              return -1;
+
+          //(reader=='#') ? (return 0) : (return 3);
+      }
+      if(reader=='r')
+      {
+          int value;
+          value=atoi((data+1));
+          
+      }
+        
+    }
     
     
+    
+    
+    return 0;
+
 }
 
 

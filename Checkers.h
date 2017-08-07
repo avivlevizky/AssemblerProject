@@ -17,7 +17,7 @@ int isInstruction(char * order, int flagMessage);
 /*Int Function: search and return the index of the given label from the symbol table, if not exist return -1*/
 int findDataInstruction(char * data);
 
-/*Boolean Function: check by the given string which type of addressing type it is*/
+/*Boolean Function: check of the given string which type of addressing type it is*/
 int checkAddressingType(char * data);
 
 

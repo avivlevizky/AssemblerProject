@@ -16,6 +16,7 @@ void insertSymbolToTable(char *data,int type)
 /* Function that insert the given data into the instructions_table, the function will update too the IC counter by matching to the length of the given data */
 void insertToIT(char **data,int Instruc_type)
 {
+    /*if the instruct type is dual places*/
     if ((Instruc_type<=SUB)||(Instruc_type==LEA))
     {
         
@@ -23,6 +24,7 @@ void insertToIT(char **data,int Instruc_type)
         
         return;
     }
+    /*if the instruct type is sole place*/
     if (((Instruc_type>=NOT)&&(Instruc_type<=CLR))||((Instruc_type>=INC)&&(Instruc_type<=JSR)))
     {
         

@@ -196,7 +196,7 @@ void SecondCheckingCommand(char ** command)
     int flag;  /*if there is a label(symbol) in the current given command line*/
     
     flag=0;
-    if (isLabel(command[0]))
+    if (isValidLabel(command[0]))
     {
         /*In the case that the first string on the current command line is a label(symbol) */
         flag=1;
