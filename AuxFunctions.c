@@ -23,7 +23,7 @@ int isValidLabel(char * label)
     i= strlen(label);
     flag=1;
     
-    if(isInstruction>=0)
+    if(isInstruction(label,0)>=0)
         flag=0;
     else
     {
@@ -42,9 +42,7 @@ int isValidLabel(char * label)
     }
     
     if (!flag)
-    {
         insertNewError("Invalid Label in line: ");
-    }
      return flag;
 }
 
@@ -52,7 +50,7 @@ int isValidLabel(char * label)
 
 
 /*int Function that checks if the given order string is an vald instruction/data defining order: if is .data then ->16, if is .string then ->17, if is .mat then ->18 ,if is .entry then -> 19, if is .extern then -> 20 ,if is mov ->func.mov,otherwise the function will return -1*/
-int isInstruction(char * order)
+int isInstruction(char * order, int flagMessage)
 {
     if (strcmp(order,"mov")==0){
         return 0;
@@ -118,7 +116,8 @@ int isInstruction(char * order)
         return 20;
     }
     
-    insertNewError("Invalid instructions");
+    if(flagMessage)
+        insertNewError("Invalid instruction in line: ");
     return -1;
 }
 
