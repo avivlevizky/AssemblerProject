@@ -10,7 +10,8 @@ int isValidLabel(char * label);
 
 
 /*int Function that checks if the given order string is an vald instruction/data defining order: if is .data then ->16, if is .string then ->17, if is .mat then ->18 ,if is .entry then -> 19, if is .extern then -> 20 ,if is mov ->func.mov,otherwise the function will return -1*/
-int isInstruction(char * order);
+/*flagMessage: indicate if to print an error message or not*/
+int isInstruction(char * order, int flagMessage);
 
 /*Function that insert the symbol into the symbols tabel by the type: 16 or 17 or 18 is data;19 is .entry and 20 is .extern otherwise is instruction type. and update SC counter too*/
 void insertSymbolToTable(char *data,int type);
