@@ -8,7 +8,7 @@
 
 extern Symbol ** symbol_table;               /*The symbols table*/
 extern void ** instructions_table;   /* for data and instruction order*/
-extern void ** data_table;
+extern int * data_table;             /*Int dynamic array to store all the data instructions*/
 extern char ** ErrorsAssembler;     /*Error in the compiling*/
 extern unsigned IC;                 /*Instruction table counter*/
 extern unsigned DC;                 /*Data table counter*/
@@ -42,7 +42,7 @@ void insertNewError(char * error)
 {
     char temp [1024];
     sprintf(temp, error, LC); // puts string into buffer
-
+    
     if (!EC)
     {
         ErrorsAssembler=(char **)calloc(1, sizeof(char *));
@@ -258,7 +258,6 @@ int main(int argc,char ** argv) {
     
     
 }
-
 
 
 
