@@ -11,48 +11,26 @@
 void insertSymbolToTable(char *data,int type)
 {
     Symbol* temp;
-    Symbol ** temp1;
     temp = (Symbol*)malloc(sizeof(Symbol));
-    if (!temp){
-
-        printf("Error in allocating memory for Symbol_table");
-        printf("\n program will terminate");
-        exit(0);
-
-    }
+    allocate_check(temp);
     temp->type = type;
     temp->label_name = data;
+    temp->dec_value = DC;
 
-    if (!symbol_table) {
 
-        symbol_table = (Symbol **)malloc(sizeof(Symbol)*(SC));
-        if (!symbol_table){
-
-            printf("Error in allocating memory for Symbol_table");
-            printf("\n program will terminate");
-            exit(0);
-
-        }
+    if (!SC) 
+    {
+        symbol_table = (Symbol **)malloc(sizeof(Symbol*));
+        allocate_check(temp);
         symbol_table[0] = temp;
-        free(temp);
-
     }
-
     else
     {
-       temp1 = (Symbol **)realloc(symbol_table,SC);
-        if (!temp1){
-
-            printf("Error in allocating memory for Symbol_table");
-            printf("\n program will terminate");
-            exit(0);
-
-        }
-        symbol_table = temp1;
-        free(temp1);
-        symbol_table[SC] = temp;
+        symbol_table = (Symbol **)realloc(symbol_table,(SC+1)*sizeof(Symbol*));
+        allocate_check(symbol_table);
+        symbol_table[SC] = temp;   
     }
-    
+     SC++;
 }
 
 
