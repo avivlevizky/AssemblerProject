@@ -8,7 +8,7 @@
 /*Function that insert the symbol into the symbols tabel by the type: 16 or 17 or 18 is data;19 is .entry and 20 is .extern otherwise is instruction type. and update SC counter too*/
 void insertSymbolToTable(char *data,int type)
 {
-        Symbol* temp;
+    Symbol* temp;
     Symbol ** temp1;
     temp = (Symbol*)malloc(sizeof(Symbol));
     if (!temp){
@@ -20,11 +20,10 @@ void insertSymbolToTable(char *data,int type)
     }
     temp->type = type;
     temp->label_name = data;
-    int i = 1;
 
     if (!symbol_table) {
 
-        symbol_table = (Symbol **)malloc(sizeof(Symbol)*(i+1));
+        symbol_table = (Symbol **)malloc(sizeof(Symbol)*(SC));
         if (!symbol_table){
 
             printf("Error in allocating memory for Symbol_table");
@@ -39,8 +38,7 @@ void insertSymbolToTable(char *data,int type)
 
     else
     {
-        i = sizeof(symbol_table/ sizeof(Symbol));
-       temp1 = (Symbol **)realloc(symbol_table,i+1);
+       temp1 = (Symbol **)realloc(symbol_table,SC);
         if (!temp1){
 
             printf("Error in allocating memory for Symbol_table");
@@ -50,7 +48,7 @@ void insertSymbolToTable(char *data,int type)
         }
         symbol_table = temp1;
         free(temp1);
-        symbol_table[i+1] = temp;
+        symbol_table[SC] = temp;
     }
     
 }
