@@ -4,6 +4,8 @@
 #include "Assembler.h"
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
+
 
 /*Function that insert the symbol into the symbols tabel by the type: 16 or 17 or 18 is data;19 is .entry and 20 is .extern otherwise is instruction type. and update SC counter too*/
 void insertSymbolToTable(char *data,int type)
