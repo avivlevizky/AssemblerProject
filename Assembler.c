@@ -88,16 +88,16 @@ void CommandLineToLinkedList(int NumIteration)
     chars_len=1;
     isComa=0;
     command=(char **)malloc(sizeof(char *));
-    allocate_check((char **)command);            /*-------------Need to check if (char **)commands is valid------------*/
+    allocate_check(command);            /*-------------Need to check if (char **)commands is valid------------*/
     command[0]=(char *)calloc(1,sizeof(char));
-    allocate_check((char *)command[0]);
-    
+    allocate_check(command[0]);
+
     while(((reader=fgetc(fp))!=EOF)&&(reader!='\n'))
     {
         if((reader!=' ')&&((reader!=',')||(isComa)))
         {
             command[word_counter]=(char *)realloc((char *)(command[word_counter]), (chars_len+1)*sizeof(char));
-            allocate_check((char *)command[word_counter]);
+            allocate_check(command[word_counter]);
             command[word_counter][chars_len-1]=reader;
             command[word_counter][chars_len]='\0';
             chars_len++;
@@ -109,9 +109,9 @@ void CommandLineToLinkedList(int NumIteration)
             {
                 word_counter++;
                 command=(char **)realloc((char **)command, (word_counter+1)*sizeof(char *));
-                allocate_check((char **)command);
+                allocate_check(command);
                 command[word_counter]=(char *)calloc(1,sizeof(char));
-                allocate_check((char *)command[word_counter]);
+                allocate_check(command[word_counter]);
                 chars_len=1;
                 isComa=(reader==',');
             }
@@ -120,9 +120,10 @@ void CommandLineToLinkedList(int NumIteration)
         }
     }
     /*Assign in the last+1 place a null (to indicate the end of the current command) */
-    word_counter++;
+    if(chars_len>1)
+        word_counter++;
     command=(char **)realloc((char **)command, (word_counter+1)*sizeof(char *));
-    allocate_check((char **)command);
+    allocate_check(command);
     command[word_counter]=NULL;
     
     if(reader=='\n')
@@ -156,7 +157,7 @@ void FirstCheckingCommand(char ** command)
     
     
     /*In the case that the first string on the current command line is a label(symbol) */
-    if((isValidLabel(command[0]))&&((flag_symbol_type=isInstruction(command[1],1)>=0)))
+    if((isValidLabel((command[0]),1))&&((flag_symbol_type=isInstruction(command[1],1)>=0)))
     {
         /*if the instrct type is an data*/
         if((flag_symbol_type>15)&&(flag_symbol_type<19))
@@ -196,7 +197,7 @@ void SecondCheckingCommand(char ** command)
     int flag;  /*if there is a label(symbol) in the current given command line*/
     
     flag=0;
-    if (isValidLabel(command[0]))
+    if (isValidLabel(command[0],1))
     {
         /*In the case that the first string on the current command line is a label(symbol) */
         flag=1;

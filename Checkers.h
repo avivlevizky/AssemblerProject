@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 /*Bool Function that checks if the label is valid by return boolean value, if will be an error the function will insert the match error into ErrorsAssembler table */
-int isValidLabel(char * label);
+int isValidLabel(char * label,int flagDotDot);
 
 
 /*int Function that checks if the given order string is an vald instruction/data defining order: if is .data then ->16, if is .string then ->17, if is .mat then ->18 ,if is .entry then -> 19, if is .extern then -> 20 ,if is mov ->func.mov,otherwise the function will return -1*/
@@ -18,8 +18,10 @@ int isInstruction(char * order, int flagMessage);
 int findDataInstruction(char * data);
 
 /*Boolean Function: check of the given string which type of addressing type it is*/
-int checkAddressingType(char * data);
+int isDirectOrRegister(char * data);
 
 
+
+char ** isValidMatrix(char * mat);
 
 #endif /* Checkers_h */

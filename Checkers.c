@@ -1,4 +1,4 @@
-
+#include <stdlib.h>
 #include "Checkers.h"
 #include "Assembler.h"
 #include <string.h>
@@ -7,8 +7,9 @@
 
 /*Private Aux function: which indicate if the given char is an alpha-bet charcter*/
 int isGoodLetter (char toTest){
+    int tester;
     
-    int tester = (int)toTest;
+    tester = (int)toTest;
     if( (tester>= 65 && tester<=90) || (tester>= 97 && tester<=122) || (tester>= 48 && tester<=57) )
     {return 1;}
     return 0;
@@ -22,7 +23,7 @@ int isGoodLetter (char toTest){
 
 
 /*Bool Function that ppp checks if the label is valid by return boolean value, if will be an error the function will insert the match error into ErrorsAssembler table */
-int isValidLabel(char * label)
+int isValidLabel(char * label,int flagDotDot)
 {
     int flag;             /*flag=0 is not valid label; flag=1 is valid label */
     size_t i;
@@ -37,13 +38,13 @@ int isValidLabel(char * label)
         int k;
         if ((int)label[0]>= 48 && (int)label[0]<=57)
             return 0;
-        for ( k = 0; k < i-2; k++)
+        for ( k = 0; k < (i-1+(!flagDotDot)) && (flag); k++)
         {
             if (!isGoodLetter(label[k]))
                 flag=0;
         }
         k++;
-        if (label[k]!=':')
+        if ((flagDotDot)&&(label[k]!=':'))
             flag=0;
     }
     
@@ -141,7 +142,7 @@ int findDataInstruction(char * data)
 
 
 /*Boolean Function: check of the given string which type of addressing type it is*/
-int checkAddressingType(char * data)
+int isDirectOrRegister(char * data)
 {
     int i;
     char reader;
@@ -170,54 +171,97 @@ int checkAddressingType(char * data)
 
 
 
+
+
+
+
+
 char ** isValidMatrix(char * mat)
 {
     char ** matFixed;           /*dynamic matrix of strings*/
-    int openB,closeB,wordCounter;
-    char * reader;
-    char barak [2];
     
+    int wordCounter,balance,i,chars_len;
+    char reader,prevReader ;
+    
+    i=0;
+    balance=0;
+    prevReader = '\0';
     matFixed=NULL;
-    barak[0]='[';
     reader='\0';
-    openB=0;
-    closeB=0;
-    wordCounter=1;
-    reader=strtok(mat,barak);
-    if(!isValidLabel(reader))
-        return matFixed;
+    chars_len=1;
+    wordCounter=0;
     
     matFixed=(char **)malloc(sizeof(char *));
-    allocate_check(matFixed);
-    matFixed[0]=reader;
-    barak[0]=']';
+    matFixed[0]=(char *)calloc(1,sizeof(char));
     
-    while((reader=strtok(NULL,barak))!=NULL)
+    while((balance>=0)&&((reader=mat[i])!='\0'))
     {
-        if(checkAddressingType(reader)==3)
+        if(reader=='[')
         {
-            matFixed=(char **)realloc(matFixed,(wordCounter+1)*sizeof(char *));
-            matFixed[wordCounter]=reader;
-            reader++;
-            barak[0]='[';
+            if(wordCounter==0)
+            {
+                if(!isValidLabel(matFixed[0],0))
+                {
+                    insertNewError("Invalid Label of matrix in line: ");
+                    freeLinkedList(matFixed);
+                    return NULL;
+                }
+            }
+            else
+            {
+                if(prevReader!=']')
+                {
+                    insertNewError("Invalid syntex in line: ");
+                    freeLinkedList(matFixed);
+                    return NULL;
+                }
+            }
         }
-        else
+        
+        if(reader==']')
         {
-            insertNewError("Invalid register index in line: ");
+            if(isDirectOrRegister(matFixed[wordCounter])!=3)
+            {
+                insertNewError("Invalid register in index array ");
+                freeLinkedList(matFixed);
+                return NULL;
+            }
             
         }
         
+        if((reader==']')||(reader=='['))
+        {
+            if(chars_len>1)
+            {
+                wordCounter++;
+                matFixed=(char **)realloc((char **)matFixed, (wordCounter+1)*sizeof(char *));
+                matFixed[wordCounter]=(char *)calloc(1,sizeof(char));
+                chars_len=1;
+            }
+            balance=(reader=='[') ? balance+1 : balance-1;
+        }
+        else
+        {
+            matFixed[wordCounter]=(char *)realloc((char *)(matFixed[wordCounter]), (chars_len+1)*sizeof(char));
+            matFixed[wordCounter][chars_len-1]=reader;
+            matFixed[wordCounter][chars_len]='\0';
+            chars_len++;
+        }
+        prevReader=reader;
+        i++;
     }
-
     
     
+    if((balance!=0)||(wordCounter!=3))
+    {
+        insertNewError("Invalid syntex in line: ");
+        freeLinkedList(matFixed);
+        return NULL;
+    }
     
     
-    return 0;
+    return matFixed;
 }
-
-
-
 
 
 
