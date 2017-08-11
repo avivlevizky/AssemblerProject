@@ -16,8 +16,8 @@ void insertSymbolToTable(char *data,int type)
     temp->label_name = data;
     temp->dec_value=DC;
     
-    if (!symbol_table) {
-        
+    if (!symbol_table)
+    {
         symbol_table = (Symbol **)malloc(sizeof(Symbol*));
         allocate_check(symbol_table);
         *symbol_table = temp;
@@ -27,9 +27,10 @@ void insertSymbolToTable(char *data,int type)
         symbol_table = (Symbol **)realloc(symbol_table,SC+1);
         allocate_check(symbol_table);
         symbol_table[SC]=temp;
-        SC++;
     }
     
+    SC++;
+
 }
 
 
