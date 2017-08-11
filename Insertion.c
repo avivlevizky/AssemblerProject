@@ -90,15 +90,28 @@ void insertToDT(char **data,int type)
                 DC++;
                 i++;
             }
-            
-            
+           
         }
             break;
             
         case STRING: /*if the type is .string*/
         {
-            
-            
+            char ch;
+            // need to check when reader is null
+            reader=data[0];
+            if ((data[1])||(reader[0]!='"'))
+                {
+                   insertNewError("The string defining isn't valid in Line: ");
+                   return;
+                }
+            i=1;
+            while((ch=reader[i]))
+                {
+                   data_table=(int*)realloc(data_table,DC+1);
+                   data_table[DC]= ch;
+                   DC++;
+                   i++;
+                }
         }
             break;
             
