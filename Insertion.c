@@ -68,17 +68,40 @@ void insertToIT(char **data,int Instruc_type)
 /*Function that insert data by the given Instruc_type argument into the data table*/
 void insertToDT(char **data,int type)
 {
+    int i;
+    char *reader;
+    
+    i=0;
+    
     switch (type) {
-        case 15:
-            <#statements#>
+        case DATA: /*if the type is .data*/
+        {
+            while((reader=data[i]))
+            {
+                if(isNumeric(reader)==-1)
+                {
+                    insertNewError("The data defining isn't valid in Line: ");
+                    return;
+                }
+                
+                
+            }
+            
+        }
             break;
             
-        case 16:
-            <#statements#>
+        case STRING: /*if the type is .string*/
+        {
+            
+            
+        }
             break;
             
-        case 17:
-            <#statements#>
+        case MAT: /*if the type is .mat*/
+        {
+            
+            
+        }
             break;
     }
     

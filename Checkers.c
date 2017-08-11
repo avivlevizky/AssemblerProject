@@ -150,17 +150,35 @@ int findDataInstruction(char * data)
 
 
 
+/*Int function that check if the given string is an int value and return is value otherwise the function will return -1*/
+int isNumeric(char * data)
+{
+    int value;
+    
+    value=atoi(data);
+    
+    if((!value)&&(strcmp(data, "0")!=0)) /*if value ==0 and the next char after '#' isn't '0' then value is an error*/
+        return -1;
+    
+    return value;
+    
+    
+}
+
+
+
+
+
 /*Boolean Function: check of the given string which type of addressing type it is*/
 int isDirectOrRegister(char * data)
 {
     if((data[0]=='#')||(data[0]=='r'))
     {
         int value;
-        value=atoi((data+1));
+        value=isNumeric(data+1);
         
-        if((!value)&&(data[1]!='0')) /*if value ==0 and the next char after '#' isn't '0' then value is an error*/
-            return -1;
-        if((data[0]=='r')&&((value<0)||(value>7))) /*if the operand is reg and the domain value is out of bounds-> return -1*/
+
+        if((value==-1)||((data[0]=='r')&&((value<0)||(value>7)))) /*if the operand is reg and the domain value is out of bounds-> return -1*/
             return -1;
         
         return (data[0]=='#') ? 0 : 3;
@@ -173,76 +191,66 @@ int isDirectOrRegister(char * data)
 
 
 
-/*function that checks if the given string is a valid matrix : then return the string as array of strings otherwise return null*/
-char * isValidMatrixToData(char * mat)
+/*function that checks if the given string is a valid matrix defining : return the the number of places that the matrix is takes otherwise return -1 if the defining is not valid*/
+int isValidMatrixToData(char * mat)
 {
-    char ** matFixed;           /*dynamic matrix of strings*/
-    
-    int wordCounter,balance,i,chars_len;
-    char reader,prevReader ;
+    char * num;
+    int balance,i,ans,chars_len,value,numOfBrac;
+    char reader,prevReader;
     
     i=0;
+    chars_len=1;
     balance=0;
     prevReader = '\0';
-    matFixed=NULL;
     reader='\0';
-    chars_len=1;
-    wordCounter=0;
+    ans=1;
+    numOfBrac=0;
     
-    matFixed=(char **)malloc(sizeof(char *));
-    matFixed[0]=(char *)calloc(1,sizeof(char));
+    num=(char *)calloc(1,sizeof(char));
+    allocate_check(num);
+
     
     while((balance>=0)&&((reader=mat[i])!='\0'))
     {
         if(reader=='[')
         {
-            if(wordCounter==0)
+            if((i>0)&&(prevReader!=']'))
             {
-                if(!isValidLabel(matFixed[0],0))
-                {
-                    insertNewError("Invalid Label of matrix in line: ");
-                    freeLinkedList(matFixed);
-                    return NULL;
-                }
+                
+                insertNewError("Invalid syntex in line: ");
+                free(num);
+                return -1;
+            }
+        }
+        if(reader==']')
+        {
+            value=isNumeric(num);
+            if(value==-1) /*if value ==0 and the next char after '#' isn't '0' then value is an error*/
+            {
+                insertNewError("Invalid syntex in line: ");
+                free(num);
+                return -1;
             }
             else
             {
-                if(prevReader!=']')
-                {
-                    insertNewError("Invalid syntex in line: ");
-                    freeLinkedList(matFixed);
-                    return NULL;
-                }
-            }
-        }
-        
-        if(reader==']')
-        {
-            if(isDirectOrRegister(matFixed[wordCounter])!=3)
-            {
-                insertNewError("Invalid register in index array ");
-                freeLinkedList(matFixed);
-                return NULL;
-            }
-            
-        }
-        
-        if((reader==']')||(reader=='['))
-        {
-            if(chars_len>1)
-            {
-                wordCounter++;
-                matFixed=(char **)realloc((char **)matFixed, (wordCounter+1)*sizeof(char *));
-                matFixed[wordCounter]=(char *)calloc(1,sizeof(char));
+                ans=ans*value;
+                free(num);
+                num=(char *)calloc(1,sizeof(char));
+                allocate_check(num);
                 chars_len=1;
             }
+        }
+        if((reader==']')||(reader=='['))
+        {
             balance=(reader=='[') ? balance+1 : balance-1;
+            numOfBrac++;
         }
         else
         {
-            matFixed[wordCounter]=(char *)realloc((char *)(matFixed[wordCounter]), (chars_len+1)*sizeof(char));
-            matFixed[wordCounter][chars_len-1]=reader;
-            matFixed[wordCounter][chars_len]='\0';
+            num=(char *)realloc((char *)(num), (chars_len+1)*sizeof(char));
+            allocate_check(num);
+            num[chars_len-1]=reader;
+            num[chars_len]='\0';
             chars_len++;
         }
         prevReader=reader;
@@ -250,15 +258,14 @@ char * isValidMatrixToData(char * mat)
     }
     
     
-    if((balance!=0)||(wordCounter!=3))
+    if((balance!=0)||(numOfBrac!=4))
     {
         insertNewError("Invalid syntex in line: ");
-        freeLinkedList(matFixed);
-        return NULL;
+        free(num);
+        return -1;
     }
     
-    
-    return matFixed;
+    return ans;
 }
 
 
@@ -287,8 +294,11 @@ char ** isValidMatrix(char * mat)
     wordCounter=0;
     
     matFixed=(char **)malloc(sizeof(char *));
+    allocate_check(matFixed);
+
     matFixed[0]=(char *)calloc(1,sizeof(char));
-    
+    allocate_check(matFixed[0]);
+
     while((balance>=0)&&((reader=mat[i])!='\0'))
     {
         if(reader=='[')
@@ -330,7 +340,9 @@ char ** isValidMatrix(char * mat)
             {
                 wordCounter++;
                 matFixed=(char **)realloc((char **)matFixed, (wordCounter+1)*sizeof(char *));
+                allocate_check(matFixed);
                 matFixed[wordCounter]=(char *)calloc(1,sizeof(char));
+                allocate_check(matFixed[wordCounter]);
                 chars_len=1;
             }
             balance=(reader=='[') ? balance+1 : balance-1;
@@ -338,6 +350,7 @@ char ** isValidMatrix(char * mat)
         else
         {
             matFixed[wordCounter]=(char *)realloc((char *)(matFixed[wordCounter]), (chars_len+1)*sizeof(char));
+            allocate_check(matFixed[wordCounter]);
             matFixed[wordCounter][chars_len-1]=reader;
             matFixed[wordCounter][chars_len]='\0';
             chars_len++;
@@ -353,7 +366,6 @@ char ** isValidMatrix(char * mat)
         freeLinkedList(matFixed);
         return NULL;
     }
-    
     
     return matFixed;
 }

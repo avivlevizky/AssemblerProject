@@ -13,7 +13,7 @@ typedef struct
 }InstructOrder;
 
 
-typedef enum {MOV,CMP,ADD,SUB,NOT,CLR,LEA,INC,DEC,JMP,BNE,RED,PRN,JSR,RTS,STOP}func;
+typedef enum {MOV,CMP,ADD,SUB,NOT,CLR,LEA,INC,DEC,JMP,BNE,RED,PRN,JSR,RTS,STOP,DATA,STRING,MAT,ENTRY,EXTERN}func;
 
 
 
@@ -22,7 +22,7 @@ typedef struct
 {
     char * label_name;
     int dec_value;
-    int type;      /*boolean variable: data order or instruction order*/
+    func type;      /*boolean variable: data order or instruction order*/
     
 }Symbol;
 
@@ -42,15 +42,23 @@ void freeLinkedList(char ** list);
 
 
 Symbol ** symbol_table;               /*The symbols table*/
+int * data_table;             /*Int dynamic array to store all the data instructions*/
 void ** instructions_table;   /* for data and instruction order*/
-//void ** data_table;           /**/
 unsigned IC;                 /*Instruction table counter*/
-//unsigned DC=0;                 /*Data table counter*/
 unsigned SC;                 /*Symbol counter*/
 char ** ErrorsAssembler;     /*Error in the compiling*/
 unsigned EC;                 /*Error counter*/
 unsigned LC;                 /*Line counter*/
 unsigned DC;                 /*Data table counter*/
+
+
+
+
+
+
+
+
+
 
 
 
