@@ -117,8 +117,30 @@ void insertToDT(char **data,int type)
             
         case MAT: /*if the type is .mat*/
         {
+            char *reader;
+            int n,i;
             
-            
+            n=isValidMatrixToData(data[0]);
+            i=0;
+            if(n<1)
+                {
+                   return;
+                }
+            while((reader=data[i+1]))
+                {
+                   value=isNumeric(reader);
+                if(!value)
+                {
+                    ("The data defining isn't valid in Line: ");
+                    return;
+                }
+                
+                data_table[DC]=*value;
+                DC++;
+                i++;
+                }
+            if (i!=n)
+                insertNewError("The defining matrix values are not equel to declaring matrix");
         }
             break;
     }
