@@ -66,9 +66,21 @@ void insertToIT(char **data,int Instruc_type)
 }
 
 /*Function that insert data by the given Instruc_type argument into the data table*/
-void insertToDT(char **data,int Instruc_type)
+void insertToDT(char **data,int type)
 {
-    
+    switch (type) {
+        case 15:
+            <#statements#>
+            break;
+            
+        case 16:
+            <#statements#>
+            break;
+            
+        case 17:
+            <#statements#>
+            break;
+    }
     
 }
 

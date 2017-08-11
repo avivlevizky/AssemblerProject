@@ -134,8 +134,17 @@ int isInstruction(char * order, int flagMessage)
 /*Int Function: search and return the index of the given label from the symbol table, if not exist return -1*/
 int findDataInstruction(char * data)
 {
- 
-    return 0;
+    Symbol * temp;
+    temp=*symbol_table;
+    
+    while(temp)
+    {
+        if(strcmp(temp->label_name,data)==0)
+            return temp->dec_value;
+        temp++;
+    }
+    
+    return -1;
 }
 
 
@@ -159,6 +168,102 @@ int isDirectOrRegister(char * data)
     return -1;
     
 }
+
+
+
+
+
+/*function that checks if the given string is a valid matrix : then return the string as array of strings otherwise return null*/
+char * isValidMatrixToData(char * mat)
+{
+    char ** matFixed;           /*dynamic matrix of strings*/
+    
+    int wordCounter,balance,i,chars_len;
+    char reader,prevReader ;
+    
+    i=0;
+    balance=0;
+    prevReader = '\0';
+    matFixed=NULL;
+    reader='\0';
+    chars_len=1;
+    wordCounter=0;
+    
+    matFixed=(char **)malloc(sizeof(char *));
+    matFixed[0]=(char *)calloc(1,sizeof(char));
+    
+    while((balance>=0)&&((reader=mat[i])!='\0'))
+    {
+        if(reader=='[')
+        {
+            if(wordCounter==0)
+            {
+                if(!isValidLabel(matFixed[0],0))
+                {
+                    insertNewError("Invalid Label of matrix in line: ");
+                    freeLinkedList(matFixed);
+                    return NULL;
+                }
+            }
+            else
+            {
+                if(prevReader!=']')
+                {
+                    insertNewError("Invalid syntex in line: ");
+                    freeLinkedList(matFixed);
+                    return NULL;
+                }
+            }
+        }
+        
+        if(reader==']')
+        {
+            if(isDirectOrRegister(matFixed[wordCounter])!=3)
+            {
+                insertNewError("Invalid register in index array ");
+                freeLinkedList(matFixed);
+                return NULL;
+            }
+            
+        }
+        
+        if((reader==']')||(reader=='['))
+        {
+            if(chars_len>1)
+            {
+                wordCounter++;
+                matFixed=(char **)realloc((char **)matFixed, (wordCounter+1)*sizeof(char *));
+                matFixed[wordCounter]=(char *)calloc(1,sizeof(char));
+                chars_len=1;
+            }
+            balance=(reader=='[') ? balance+1 : balance-1;
+        }
+        else
+        {
+            matFixed[wordCounter]=(char *)realloc((char *)(matFixed[wordCounter]), (chars_len+1)*sizeof(char));
+            matFixed[wordCounter][chars_len-1]=reader;
+            matFixed[wordCounter][chars_len]='\0';
+            chars_len++;
+        }
+        prevReader=reader;
+        i++;
+    }
+    
+    
+    if((balance!=0)||(wordCounter!=3))
+    {
+        insertNewError("Invalid syntex in line: ");
+        freeLinkedList(matFixed);
+        return NULL;
+    }
+    
+    
+    return matFixed;
+}
+
+
+
+
 
 
 

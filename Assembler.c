@@ -80,13 +80,14 @@ void CommandLineToLinkedList(int NumIteration)
 {
     char ** command;           /*dynamic matrix of strings*/
     char reader;              /*char variable to iterate on content std*/
-    int chars_len,word_counter,isComa;      /*chars_len: the char length of the current word; word_counter: indicate in the current number of word; isComa: indicate if coma was encourted more than one time*/
+    int chars_len,word_counter,isComa,isQuot;      /*chars_len: the char length of the current word; word_counter: indicate in the current number of word; isComa: indicate if coma was encourted more than one time ; isQueat: indicate if quotation marks apeared for ignore the creation of new string */
     
     LC++;
     reader='\0';
     word_counter=0;
     chars_len=1;
     isComa=0;
+    isQuot=0;
     command=(char **)malloc(sizeof(char *));
     allocate_check(command);            /*-------------Need to check if (char **)commands is valid------------*/
     command[0]=(char *)calloc(1,sizeof(char));
@@ -96,6 +97,7 @@ void CommandLineToLinkedList(int NumIteration)
     {
         if((reader!=' ')&&((reader!=',')||(isComa)))
         {
+            isQuot = (reader=='"') ? isQuot ^1 : isQuot;
             command[word_counter]=(char *)realloc((char *)(command[word_counter]), (chars_len+1)*sizeof(char));
             allocate_check(command[word_counter]);
             command[word_counter][chars_len-1]=reader;
@@ -105,7 +107,7 @@ void CommandLineToLinkedList(int NumIteration)
         }
         else
         {
-            if(chars_len>1)
+            if((!isQuot)&&(chars_len>1))
             {
                 word_counter++;
                 command=(char **)realloc((char **)command, (word_counter+1)*sizeof(char *));

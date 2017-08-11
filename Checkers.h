@@ -21,7 +21,7 @@ int findDataInstruction(char * data);
 int isDirectOrRegister(char * data);
 
 
-
+/*function that checks if the given string is a valid matrix : then return the string as array of strings otherwise return null*/
 char ** isValidMatrix(char * mat);
 
 #endif /* Checkers_h */
