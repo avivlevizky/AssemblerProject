@@ -144,29 +144,20 @@ int findDataInstruction(char * data)
 /*Boolean Function: check of the given string which type of addressing type it is*/
 int isDirectOrRegister(char * data)
 {
-    int i;
-    char reader;
-    
-    i=0;
-    
-    while((reader=data[i])!='\0')
+    if((data[0]=='#')||(data[0]=='r'))
     {
-      if((reader=='#')||(reader=='r'))
-      {
-          int value;
-          value=atoi((data+1));
-          
-          if((!value)&&(data[1]!='0')) /*if value ==0 and the next char after '#' isn't '0' then value is an error*/
-              return -1;
-          if((reader=='r')&&((value<0)||(value>7))) /*if the operand is reg and the domain value is out of bounds-> return -1*/
-              return -1;
-
-          return (reader=='#') ? 0 : 3;
-      }
+        int value;
+        value=atoi((data+1));
+        
+        if((!value)&&(data[1]!='0')) /*if value ==0 and the next char after '#' isn't '0' then value is an error*/
+            return -1;
+        if((data[0]=='r')&&((value<0)||(value>7))) /*if the operand is reg and the domain value is out of bounds-> return -1*/
+            return -1;
+        
+        return (data[0]=='#') ? 0 : 3;
     }
-    
     return -1;
-
+    
 }
 
 
@@ -174,8 +165,7 @@ int isDirectOrRegister(char * data)
 
 
 
-
-
+/*function that checks if the given string is a valid matrix : then return the string as array of strings otherwise return null*/
 char ** isValidMatrix(char * mat)
 {
     char ** matFixed;           /*dynamic matrix of strings*/
