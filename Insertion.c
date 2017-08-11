@@ -68,6 +68,7 @@ void insertToIT(char **data,int Instruc_type)
 /*Function that insert data by the given Instruc_type argument into the data table*/
 void insertToDT(char **data,int type)
 {
+    int* value;
     int i;
     char *reader;
     
@@ -78,14 +79,18 @@ void insertToDT(char **data,int type)
         {
             while((reader=data[i]))
             {
-                if(isNumeric(reader)==-1)
+                value=isNumeric(reader);
+                if(!value)
                 {
                     insertNewError("The data defining isn't valid in Line: ");
                     return;
                 }
                 
-                
+                data_table[DC]=*value;
+                DC++;
+                i++;
             }
+            
             
         }
             break;
