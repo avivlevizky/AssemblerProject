@@ -30,7 +30,7 @@ void insertSymbolToTable(char *data,int type)
     }
     
     SC++;
-
+    
 }
 
 
@@ -82,15 +82,15 @@ void insertToDT(char **data,int type)
                 value=isNumeric(reader);
                 if(!value)
                 {
-                    insertNewError("The data defining isn't valid in Line: ");
+                    insertNewError("The data defining isn't valid in Line: %d");
                     return;
                 }
-                
+                data_table=(int*)realloc(data_table,DC+1);
                 data_table[DC]=*value;
                 DC++;
                 i++;
             }
-           
+            
         }
             break;
             
@@ -99,48 +99,66 @@ void insertToDT(char **data,int type)
             char ch;
             // need to check when reader is null
             reader=data[0];
-            if ((data[1])||(reader[0]!='"'))
-                {
-                   insertNewError("The string defining isn't valid in Line: ");
-                   return;
-                }
+            
+            if ((!reader[0])||(reader[0]!='"'))
+            {
+                insertNewError("The string defining isn't valid in Line: %d");
+                return;
+            }
             i=1;
-            while((ch=reader[i]))
+            while((reader[i])&&(ch=reader[i]))
+            {
+                if(reader[i]=='"')
                 {
-                   data_table=(int*)realloc(data_table,DC+1);
-                   data_table[DC]= ch;
-                   DC++;
-                   i++;
+                    if(reader[i+1])
+                        insertNewError("The string defining isn't valid in Line: %d");
+                    
+                    return;
+                    
                 }
+                data_table=(int*)realloc(data_table,DC+1);
+                data_table[DC]= ch;
+                DC++;
+                i++;
+            }
+            insertNewError("The string defining missing \" token in Line: %d");
+
+            
         }
             break;
             
         case MAT: /*if the type is .mat*/
         {
-            char *reader;
-            int n,i;
+            int n;
             
             n=isValidMatrixToData(data[0]);
+            
+            if(n==-1)
+            {
+                insertNewError("The matrix defining isn't valid in Line: %d");
+                return;
+            }
+            
             i=0;
-            if(n<1)
-                {
-                   return;
-                }
+
             while((reader=data[i+1]))
-                {
-                   value=isNumeric(reader);
+            {
+                value=isNumeric(reader);
                 if(!value)
                 {
-                    ("The data defining isn't valid in Line: ");
+                    insertNewError("The matrix defining isn't valid in Line: %d");
+                    free(value);
                     return;
                 }
                 
+                data_table=(int*)realloc(data_table,DC+1);
                 data_table[DC]=*value;
+                free(value);
                 DC++;
                 i++;
-                }
+            }
             if (i!=n)
-                insertNewError("The defining matrix values are not equel to declaring matrix");
+                insertNewError("The defining matrix values are not equel to declaring matrix: %d");
         }
             break;
     }
@@ -153,7 +171,6 @@ void updateInstruction(char **data,int Instruc_type)
     
     
 }
-
 
 
 

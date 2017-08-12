@@ -18,8 +18,8 @@ int isInstruction(char * order, int flagMessage);
 int findDataInstruction(char * data);
 
 
-/*Int function that check if the given string is an int value and return is value otherwise the function will return -1*/
-int isNumeric(char * data);
+/*Int function that check if the given string is an int value and return is value otherwise the function will return null*/
+int * isNumeric(char * data);
 
 
 /*Boolean Function: check of the given string which type of addressing type it is*/

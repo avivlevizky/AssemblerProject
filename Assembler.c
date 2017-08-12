@@ -7,15 +7,15 @@
 #include "Insertion.h"
 
 
-extern Symbol ** symbol_table;               /*The symbols table*/
-extern void ** instructions_table;   /* for data and instruction order*/
-extern int * data_table;             /*Int dynamic array to store all the data instructions*/
-extern char ** ErrorsAssembler;     /*Error in the compiling*/
-extern unsigned IC;                 /*Instruction table counter*/
-extern unsigned DC;                 /*Data table counter*/
-extern unsigned SC;                 /*Symbol counter*/
-extern unsigned EC;                 /*Error counter*/
-extern unsigned LC;                 /*Line counter*/
+Symbol ** symbol_table;               /*The symbols table*/
+void ** instructions_table;   /* for data and instruction order*/
+int * data_table;             /*Int dynamic array to store all the data instructions*/
+char ** ErrorsAssembler;     /*Error in the compiling*/
+unsigned IC;                 /*Instruction table counter*/
+unsigned DC;                 /*Data table counter*/
+unsigned SC;                 /*Symbol counter*/
+unsigned EC;                 /*Error counter*/
+unsigned LC;                 /*Line counter*/
 unsigned word_counter;
 FILE * fp;                           /*FILE pointer to the given assembly file*/
 
@@ -36,24 +36,43 @@ void allocate_check(void * p)
 }
 
 
+int lenOfNum(int n)
+{
+    int ans;
+    
+    ans=1;
+    
+    while((n=(n/10))>=1)
+    {
+        ans++;
+    }
+    return ans;
+}
 
 
 /*fucntion that insert new assembler error into ErrorsAssembler table */
 void insertNewError(char * error)
 {
-    char temp [1024];
-    sprintf(temp, error, LC); // puts string into buffer
+    char *message =(char *)malloc(strlen(error)+lenOfNum(LC)+1);
+    sprintf(message, error, LC); // puts string into buffer
+    message[strlen(error)+lenOfNum(LC)]='\0';
+    
     
     if (!EC)
     {
-        ErrorsAssembler=(char **)calloc(1, sizeof(char *));
-        allocate_check((char **)ErrorsAssembler);            /*-------------Need to check if (char **)commands is valid------------*/
-        
+        ErrorsAssembler=(char **)malloc(sizeof(char *));
+        allocate_check((char **)ErrorsAssembler);
     }
-    ErrorsAssembler[EC]=error;
+    else
+    {
+        ErrorsAssembler=(char **)realloc((char **)ErrorsAssembler, (EC+1)*sizeof(char *));
+        allocate_check(ErrorsAssembler);
+    }
+    ErrorsAssembler[EC]=message;
     EC++;
-    ErrorsAssembler=(char **)realloc((char **)ErrorsAssembler, (EC+1)*sizeof(char *));
-    allocate_check((char *)ErrorsAssembler[EC]);
+    
+    
+    
     
 }
 
@@ -63,9 +82,9 @@ void insertNewError(char * error)
 /*function that free the linked list of strings*/
 void freeLinkedList(char ** list)
 {
-    while(list)
+    while(*list)
     {
-        free((char *)*list);
+        free(*list);
         list++;
     }
 }
@@ -123,9 +142,11 @@ void CommandLineToLinkedList(int NumIteration)
     }
     /*Assign in the last+1 place a null (to indicate the end of the current command) */
     if(chars_len>1)
+    {
         word_counter++;
-    command=(char **)realloc((char **)command, (word_counter+1)*sizeof(char *));
-    allocate_check(command);
+        command=(char **)realloc((char **)command, (word_counter+1)*sizeof(char *));
+        allocate_check(command);
+    }
     command[word_counter]=NULL;
     
     if(reader=='\n')
@@ -157,6 +178,10 @@ void FirstCheckingCommand(char ** command)
 {
     int flag_symbol_type;
     
+    /*if the given string list is null/empty */
+    if(!(*command))
+        return;
+
     
     /*In the case that the first string on the current command line is a label(symbol) */
     if((isValidLabel((command[0]),1))&&((flag_symbol_type=isInstruction(command[1],1)>=0)))
@@ -179,6 +204,12 @@ void FirstCheckingCommand(char ** command)
     {
         if ((flag_symbol_type=isInstruction(command[0],1))>=0)
         {
+            if((flag_symbol_type>=DATA)&&(flag_symbol_type<=MAT))
+            {
+                insertToDT(&command[1],flag_symbol_type);
+                return;
+            }
+
             if (flag_symbol_type>=19)
             {
                 if(flag_symbol_type==20) /*if is .extern insruct type then we will enter the command into the symbol table*/
@@ -189,6 +220,9 @@ void FirstCheckingCommand(char ** command)
                 insertToIT(&command[1],flag_symbol_type);  /*the command[1] is first operand*/
             }
         }
+        else
+            insertNewError("Undifined command line: ");
+        
     }
 }
 
@@ -198,6 +232,10 @@ void SecondCheckingCommand(char ** command)
     int flag_symbol_type;
     int flag;  /*if there is a label(symbol) in the current given command line*/
     
+    /*if the given string list is null/empty */
+    if(!(*command))
+        return;
+
     flag=0;
     if (isValidLabel(command[0],1))
     {

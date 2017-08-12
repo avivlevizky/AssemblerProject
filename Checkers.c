@@ -3,6 +3,8 @@
 #include "Assembler.h"
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
+
 
 
 /*Private Aux function: which indicate if the given char is an alpha-bet charcter*/
@@ -49,7 +51,7 @@ int isValidLabel(char * label,int flagDotDot)
     }
     
     if (!flag)
-        insertNewError("Invalid Label in line: ");
+        insertNewError("Invalid Label in line: %d");
     return flag;
 }
 
@@ -125,7 +127,7 @@ int isInstruction(char * order, int flagMessage)
     }
     
     if(flagMessage)
-        insertNewError("Invalid instruction in line: ");
+        insertNewError("Invalid instruction in line: %d");
     return -1;
 }
 
@@ -151,16 +153,37 @@ int findDataInstruction(char * data)
 
 
 /*Int function that check if the given string is an int value and return is value otherwise the function will return -1*/
-int isNumeric(char * data)
+int * isNumeric(char * data)
 {
-    int value;
+    int * value;
+    int ans,i,signMinus,length;
     
-    value=atoi(data);
+    i=0;
+    ans=0;
+    signMinus=0;
+    length=(int)strlen(data);
+    value=(int *)malloc(sizeof(int));
+    allocate_check(value);
+
+    if(data[0]=='-')
+        signMinus++;
     
-    if((!value)&&(strcmp(data, "0")!=0)) /*if value ==0 and the next char after '#' isn't '0' then value is an error*/
-        return -1;
-    
+    while((i+signMinus<length)&&(data[i+signMinus]>='0')&&(data[i+signMinus]<='9'))
+    {
+        ans=ans+((data[i+signMinus])-48)*pow(10,length-signMinus-i-1);
+        
+        i++;
+    }
+    if((i+signMinus)==length)
+        *value= (signMinus) ? ans*(-1) : ans;
+    else
+    {
+        free(value);
+        value=NULL;
+    }
     return value;
+    
+    
     
     
 }
@@ -174,11 +197,11 @@ int isDirectOrRegister(char * data)
 {
     if((data[0]=='#')||(data[0]=='r'))
     {
-        int value;
+        int *value;
         value=isNumeric(data+1);
         
 
-        if((value==-1)||((data[0]=='r')&&((value<0)||(value>7)))) /*if the operand is reg and the domain value is out of bounds-> return -1*/
+        if((!value)||((data[0]=='r')&&((*value<0)||(*value>7)))) /*if the operand is reg and the domain value is out of bounds-> return -1*/
             return -1;
         
         return (data[0]=='#') ? 0 : 3;
@@ -194,11 +217,13 @@ int isDirectOrRegister(char * data)
 /*function that checks if the given string is a valid matrix defining : return the the number of places that the matrix is takes otherwise return -1 if the defining is not valid*/
 int isValidMatrixToData(char * mat)
 {
+    int * value;
     char * num;
-    int balance,i,ans,chars_len,value,numOfBrac;
+    int balance,i,ans,chars_len,numOfBrac;
     char reader,prevReader;
     
     i=0;
+    value=NULL;
     chars_len=1;
     balance=0;
     prevReader = '\0';
@@ -216,24 +241,20 @@ int isValidMatrixToData(char * mat)
         {
             if((i>0)&&(prevReader!=']'))
             {
-                
-                insertNewError("Invalid syntex in line: ");
-                free(num);
-                return -1;
+                goto Failure;
             }
         }
         if(reader==']')
         {
             value=isNumeric(num);
-            if(value==-1) /*if value ==0 and the next char after '#' isn't '0' then value is an error*/
+            if((!value)||(*value<=0)) /*if value ==null and the next char after '#' isn't '0' then value is an error*/
             {
-                insertNewError("Invalid syntex in line: ");
-                free(num);
-                return -1;
+                goto Failure;
+
             }
             else
             {
-                ans=ans*value;
+                ans=ans*(*value);
                 free(num);
                 num=(char *)calloc(1,sizeof(char));
                 allocate_check(num);
@@ -260,9 +281,11 @@ int isValidMatrixToData(char * mat)
     
     if((balance!=0)||(numOfBrac!=4))
     {
-        insertNewError("Invalid syntex in line: ");
-        free(num);
-        return -1;
+    Failure: insertNewError("Invalid syntex in line: ");
+             free(num);
+             if(value)
+               free(value);
+             return -1;
     }
     
     return ans;
@@ -307,7 +330,7 @@ char ** isValidMatrix(char * mat)
             {
                 if(!isValidLabel(matFixed[0],0))
                 {
-                    insertNewError("Invalid Label of matrix in line: ");
+                    insertNewError("Invalid Label of matrix in line: %d");
                     freeLinkedList(matFixed);
                     return NULL;
                 }
@@ -316,7 +339,7 @@ char ** isValidMatrix(char * mat)
             {
                 if(prevReader!=']')
                 {
-                    insertNewError("Invalid syntex in line: ");
+                    insertNewError("Invalid syntex in line: %d");
                     freeLinkedList(matFixed);
                     return NULL;
                 }
@@ -327,7 +350,7 @@ char ** isValidMatrix(char * mat)
         {
             if(isDirectOrRegister(matFixed[wordCounter])!=3)
             {
-                insertNewError("Invalid register in index array ");
+                insertNewError("Invalid register in index array line: %d");
                 freeLinkedList(matFixed);
                 return NULL;
             }
@@ -362,7 +385,7 @@ char ** isValidMatrix(char * mat)
     
     if((balance!=0)||(wordCounter!=3))
     {
-        insertNewError("Invalid syntex in line: ");
+        insertNewError("Invalid syntex in line: %d");
         freeLinkedList(matFixed);
         return NULL;
     }
