@@ -24,7 +24,7 @@ int isGoodLetter (char toTest){
 
 
 
-/*Bool Function that ppp checks if the label is valid by return boolean value, if will be an error the function will insert the match error into ErrorsAssembler table */
+/*Bool Function that checks if the label is valid by return boolean value, if will be an error the function will insert the match error into ErrorsAssembler table */
 int isValidLabel(char * label,int flagDotDot)
 {
     int flag;             /*flag=0 is not valid label; flag=1 is valid label */
@@ -50,8 +50,6 @@ int isValidLabel(char * label,int flagDotDot)
             flag=0;
     }
     
-    if (!flag)
-        insertNewError("Invalid Label in line: %d");
     return flag;
 }
 
@@ -134,7 +132,7 @@ int isInstruction(char * order, int flagMessage)
 
 
 /*Int Function: search and return the index of the given label from the symbol table, if not exist return -1*/
-int findDataInstruction(char * data)
+int findSymbol(char * data)
 {
     Symbol * temp;
     temp=*symbol_table;
@@ -330,7 +328,7 @@ char ** isValidMatrix(char * mat)
             {
                 if(!isValidLabel(matFixed[0],0))
                 {
-                    insertNewError("Invalid Label of matrix in line: %d");
+                    //insertNewError("Invalid Label of matrix in line: %d");
                     freeLinkedList(matFixed);
                     return NULL;
                 }
@@ -339,7 +337,7 @@ char ** isValidMatrix(char * mat)
             {
                 if(prevReader!=']')
                 {
-                    insertNewError("Invalid syntex in line: %d");
+                    //insertNewError("Invalid syntex in line: %d");
                     freeLinkedList(matFixed);
                     return NULL;
                 }
@@ -350,7 +348,7 @@ char ** isValidMatrix(char * mat)
         {
             if(isDirectOrRegister(matFixed[wordCounter])!=3)
             {
-                insertNewError("Invalid register in index array line: %d");
+                //insertNewError("Invalid register in index array line: %d");
                 freeLinkedList(matFixed);
                 return NULL;
             }
@@ -382,10 +380,17 @@ char ** isValidMatrix(char * mat)
         i++;
     }
     
+    if(chars_len>1)
+    {
+        wordCounter++;
+        matFixed=(char **)realloc((char **)matFixed, (wordCounter+1)*sizeof(char *));
+        allocate_check(matFixed);
+    }
+    matFixed[wordCounter]=NULL;
     
     if((balance!=0)||(wordCounter!=3))
     {
-        insertNewError("Invalid syntex in line: %d");
+        //insertNewError("Invalid syntex in line: %d");
         freeLinkedList(matFixed);
         return NULL;
     }
@@ -394,6 +399,34 @@ char ** isValidMatrix(char * mat)
 }
 
 
+
+
+
+
+int checkAddressingType(char * data)
+{
+    int addrType;
+    char ** mat_data = NULL;
+    
+    if(!data)
+        return -2;
+   
+
+    addrType=isDirectOrRegister(data);
+    
+    if(addrType==-1)
+    {
+        if((mat_data=isValidMatrix(data)))
+            addrType=2;
+        else
+            addrType=(isValidLabel(data, 0))  ? 1 : -1;
+    }
+
+    
+    freeLinkedList(mat_data);
+    return addrType;
+    
+}
 
 
 

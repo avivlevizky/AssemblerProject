@@ -8,9 +8,26 @@ typedef struct
     unsigned int dest_addressing: 2;
     unsigned int origin_addressing: 2;
     unsigned int opcode: 4;
-    
-    
 }InstructOrder;
+
+
+typedef struct
+{
+    char value;
+    unsigned int type_coding: 2;
+}InstructData;
+
+
+
+typedef struct
+{
+    unsigned int reg1: 4;
+    unsigned int reg2: 4;
+    unsigned int type_coding: 2;
+}InstructRegisters;
+
+
+
 
 
 typedef enum {MOV,CMP,ADD,SUB,NOT,CLR,LEA,INC,DEC,JMP,BNE,RED,PRN,JSR,RTS,STOP,DATA,STRING,MAT,ENTRY,EXTERN}func;

@@ -15,7 +15,8 @@ int isInstruction(char * order, int flagMessage);
 
 
 /*Int Function: search and return the index of the given label from the symbol table, if not exist return -1*/
-int findDataInstruction(char * data);
+int findSymbol(char * data);
+
 
 
 /*Int function that check if the given string is an int value and return is value otherwise the function will return null*/
@@ -32,5 +33,9 @@ int isValidMatrixToData(char * mat);
 
 /*function that checks if the given string is a valid matrix : then return the string as array of strings otherwise return null*/
 char ** isValidMatrix(char * mat);
+
+
+int checkAddressingType(char * data);
+
 
 #endif /* Checkers_h */

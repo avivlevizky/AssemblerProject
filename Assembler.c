@@ -186,8 +186,8 @@ void FirstCheckingCommand(char ** command)
     /*In the case that the first string on the current command line is a label(symbol) */
     if((isValidLabel((command[0]),1))&&((flag_symbol_type=isInstruction(command[1],1)>=0)))
     {
-        /*if the instrct type is an data*/
-        if((flag_symbol_type>15)&&(flag_symbol_type<19))
+        /*if the instrct type is an data or extern*/
+        if(((flag_symbol_type>=DATA)&&(flag_symbol_type<=MAT))||(flag_symbol_type==EXTERN))
         {
             insertSymbolToTable(command[0],flag_symbol_type);
             insertToDT(&command[2],flag_symbol_type);
@@ -199,7 +199,6 @@ void FirstCheckingCommand(char ** command)
             insertToIT(&command[2],flag_symbol_type);   /*the command[2] is first operand*/
         }
     }
-    
     else /*if the commands[0] isn't label*/
     {
         if ((flag_symbol_type=isInstruction(command[0],1))>=0)
