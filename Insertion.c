@@ -7,6 +7,57 @@
 #include <stdio.h>
 
 
+
+
+
+
+
+void createNewSpaceToITtable(int typeOfOrder)
+{
+    Instruction **temp;
+    if(!instructions_table){
+        instructions_table=(Instruction **)malloc(sizeof(Instruction *));
+        allocate_check(instructions_table);
+    }
+    
+    temp=(Instruction **)malloc(sizeof(Instruction**)*(IC+1));
+    allocate_check(temp);
+    
+    memmove(temp,instructions_table,IC*sizeof(Instruction**));
+    
+    instructions_table=temp;
+    instructions_table[IC]=(Instruction *)malloc(sizeof(Instruction));
+    allocate_check(instructions_table[IC]);
+    
+    switch (typeOfOrder)
+    {
+        case 1: /*if type Order is InstructOrder*/
+        {
+            instructions_table[IC]->order=(InstructOrder *)malloc(sizeof(InstructOrder));
+            allocate_check(instructions_table[IC]->order);
+            break;
+        }
+            
+        case 2: /*if type Order is InstructData*/
+        {
+            instructions_table[IC]->order=(InstructData *)malloc(sizeof(InstructData));
+            allocate_check(instructions_table[IC]->order);
+            break;
+            
+        }
+        case 3: /*if type Order is InstructRegister*/
+        {
+            instructions_table[IC]->order=(InstructRegisters *)malloc(sizeof(InstructRegisters));
+            allocate_check(instructions_table[IC]->order);
+            break;
+            
+        }
+    }
+    
+}
+
+
+
 void insertToItForOperand(char * data,int operand, int isOriginOperand)
 {
     int * value;
@@ -24,10 +75,8 @@ void insertToItForOperand(char * data,int operand, int isOriginOperand)
             regOrder.reg1=*value;
         else
             regOrder.reg2=*value;
-        instructions_table[IC]=(Instruction *)malloc(sizeof(Instruction));
-        allocate_check(instructions_table[IC]);
-        instructions_table[IC]->order=(InstructRegisters *)malloc(sizeof(InstructRegisters));
-        allocate_check(instructions_table[IC]->order);
+        
+        createNewSpaceToITtable(3);
         *(((InstructRegisters *)(instructions_table[IC]->order)))=regOrder;
         instructions_table[IC]->type_order=2;
         IC++;
@@ -44,15 +93,9 @@ void insertToItForOperand(char * data,int operand, int isOriginOperand)
     }
     
     
-    
-    
     dataOrder.type_coding=0;
-    instructions_table[IC]=(Instruction *)malloc(sizeof(Instruction));
-    allocate_check(instructions_table[IC]);
-
-    instructions_table[IC]->order=(InstructData *)malloc(sizeof(InstructData));
-    allocate_check(instructions_table[IC]->order);
-
+    
+    createNewSpaceToITtable(2);
     *(((InstructData *)(instructions_table[IC]->order)))=dataOrder;
     instructions_table[IC]->type_order=1;
     IC++;
@@ -65,10 +108,7 @@ void insertToItForOperand(char * data,int operand, int isOriginOperand)
         
 
         /*allocate new place registers coding*/
-        instructions_table[IC]=(Instruction *)malloc(sizeof(Instruction));
-        allocate_check(instructions_table[IC]);
-        instructions_table[IC]->order=(InstructRegisters *)malloc(sizeof(InstructRegisters));
-        allocate_check(instructions_table[IC]->order);
+        createNewSpaceToITtable(3);
         *(((InstructRegisters *)(instructions_table[IC]->order)))=regOrder;
         instructions_table[IC]->type_order=2;
         IC++;
@@ -127,14 +167,23 @@ void insertSymbolToTable(char *data,int type)
 
 
 
+
+
+
+
+
+
+
 /* Function that insert the given data into the instructions_table, the function will update too the IC counter by matching to the length of the given data */
 void insertToIT(char **data,int Instruc_type)
 {
     int orgOperand,destOperand;
     InstructOrder order;
     
+    destOperand=-2;
     orgOperand=checkAddressingType(data[0]);
-    destOperand=checkAddressingType(data[1]);
+    if(orgOperand!=-2)
+        destOperand=checkAddressingType(data[1]);
 
     
     if((orgOperand==-1)||(destOperand==-1))
@@ -165,7 +214,7 @@ void insertToIT(char **data,int Instruc_type)
     {   /*if the instruct type is sole place*/
         if (((Instruc_type>=NOT)&&(Instruc_type<=CLR))||((Instruc_type>=INC)&&(Instruc_type<=JSR)))
         {
-            if((orgOperand!=-2)||(destOperand==-2))
+            if((orgOperand==-2)||(destOperand!=-2))
                 goto Failure;
         
             if((Instruc_type!=PRN)&&(destOperand==0))
@@ -179,28 +228,13 @@ void insertToIT(char **data,int Instruc_type)
     }
     /*if the operand/s are valid then: */
     order.type_coding=0;
-    order.origin_addressing=orgOperand;
-    order.dest_addressing=destOperand;
+    order.origin_addressing=(orgOperand==-2) ? 0 : orgOperand;
+    order.dest_addressing=(destOperand==-2) ? 0 : destOperand;
     order.opcode=Instruc_type;
     
-    if(!instructions_table){
-        instructions_table=(Instruction **)malloc(sizeof(Instruction *));
-        allocate_check(instructions_table);
-    }
-    
-    
-    instructions_table=(Instruction **)realloc(instructions_table, IC+1);
-    allocate_check(instructions_table);
-    
-    instructions_table[IC]=(Instruction *)malloc(sizeof(Instruction));
-    allocate_check(instructions_table[IC]);
-
-    instructions_table[IC]->order=(InstructOrder *)malloc(sizeof(InstructOrder));
-    allocate_check(instructions_table[IC]->order);
-
+    createNewSpaceToITtable(1);
     *(((InstructOrder *)(instructions_table[IC]->order)))=order;
     instructions_table[IC]->type_order=0;
-
     IC++;
 
     /*if both of the operands are registers*/
@@ -211,10 +245,7 @@ void insertToIT(char **data,int Instruc_type)
         regOrder.reg1=(*isNumeric(data[0]+1));
         regOrder.reg2=(*isNumeric(data[1]+1));
         
-        instructions_table[IC]=(Instruction *)malloc(sizeof(Instruction));
-        allocate_check(instructions_table[IC]);
-        instructions_table[IC]->order=(InstructRegisters *)malloc(sizeof(InstructRegisters));
-        allocate_check(instructions_table[IC]->order);
+        createNewSpaceToITtable(3);
         *(((InstructRegisters *)(instructions_table[IC]->order)))=regOrder;
         instructions_table[IC]->type_order=2;
         IC++;
