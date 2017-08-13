@@ -34,7 +34,6 @@ typedef struct
 {
     unsigned int reg1: 4;
     unsigned int reg2: 4;
-    unsigned int type_coding: 2;
 }InstructRegisters;
 
 

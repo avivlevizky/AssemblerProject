@@ -7,8 +7,7 @@
 #include <stdio.h>
 
 
-
-void insertToItForOperand(char * data,int operand)
+void insertToItForOperand(char * data,int operand, int isOriginOperand)
 {
     int * value;
     char ** mat_data;
@@ -16,11 +15,35 @@ void insertToItForOperand(char * data,int operand)
     InstructRegisters regOrder;
     
     
-    if((operand==0)||(operand==3))
+    /*If the given operand is register*/
+    if(operand==3)
+    {
+        value=isNumeric(data+1);
+        
+        if(isOriginOperand)
+            regOrder.reg1=*value;
+        else
+            regOrder.reg2=*value;
+        instructions_table[IC]=(Instruction *)malloc(sizeof(Instruction));
+        allocate_check(instructions_table[IC]);
+        instructions_table[IC]->order=(InstructRegisters *)malloc(sizeof(InstructRegisters));
+        allocate_check(instructions_table[IC]->order);
+        *(((InstructRegisters *)(instructions_table[IC]->order)))=regOrder;
+        instructions_table[IC]->type_order=2;
+        IC++;
+        
+        return;
+    }
+
+    
+    /*If the given operand is label,mat or direct addressing*/
+    if(operand==0)
     {
         value=isNumeric(data+1);
         dataOrder.value=*value;
     }
+    
+    
     
     
     dataOrder.type_coding=0;
@@ -39,13 +62,13 @@ void insertToItForOperand(char * data,int operand)
         mat_data=isValidMatrix(data);
         regOrder.reg1=(*isNumeric((mat_data[1]+1)));
         regOrder.reg2=(*isNumeric((mat_data[2]+1)));
-        regOrder.type_coding=0;
+        
+
+        /*allocate new place registers coding*/
         instructions_table[IC]=(Instruction *)malloc(sizeof(Instruction));
         allocate_check(instructions_table[IC]);
-
         instructions_table[IC]->order=(InstructRegisters *)malloc(sizeof(InstructRegisters));
         allocate_check(instructions_table[IC]->order);
-
         *(((InstructRegisters *)(instructions_table[IC]->order)))=regOrder;
         instructions_table[IC]->type_order=2;
         IC++;
@@ -109,7 +132,7 @@ void insertToIT(char **data,int Instruc_type)
 {
     int orgOperand,destOperand;
     InstructOrder order;
-
+    
     orgOperand=checkAddressingType(data[0]);
     destOperand=checkAddressingType(data[1]);
 
@@ -180,11 +203,32 @@ void insertToIT(char **data,int Instruc_type)
 
     IC++;
 
-    if(orgOperand!=-2)
-        insertToItForOperand(data[0],orgOperand);
+    /*if both of the operands are registers*/
+    if((orgOperand==3)&&(destOperand==3))
+    {
+        InstructRegisters regOrder;
+        
+        regOrder.reg1=(*isNumeric(data[0]+1));
+        regOrder.reg2=(*isNumeric(data[1]+1));
+        
+        instructions_table[IC]=(Instruction *)malloc(sizeof(Instruction));
+        allocate_check(instructions_table[IC]);
+        instructions_table[IC]->order=(InstructRegisters *)malloc(sizeof(InstructRegisters));
+        allocate_check(instructions_table[IC]->order);
+        *(((InstructRegisters *)(instructions_table[IC]->order)))=regOrder;
+        instructions_table[IC]->type_order=2;
+        IC++;
+
+    }
+    else
+    {
+        if(orgOperand!=-2)
+            insertToItForOperand(data[0],orgOperand,1);
+        
+        if(destOperand!=-2)
+            insertToItForOperand(data[1],destOperand,0);
+    }
     
-    if(destOperand!=-2)
-        insertToItForOperand(data[1],destOperand);
     
 }
 
