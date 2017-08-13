@@ -12,8 +12,9 @@ int isGoodLetter (char toTest){
     int tester;
     
     tester = (int)toTest;
-    if( (tester>= 65 && tester<=90) || (tester>= 97 && tester<=122) || (tester>= 48 && tester<=57) )
-    {return 1;}
+    if( (tester>= 65 && tester<=90) || (tester>= 97 && tester<=122) || (tester>= 48 && tester<=57))
+        return 1;
+
     return 0;
 }
 
@@ -28,24 +29,24 @@ int isGoodLetter (char toTest){
 int isValidLabel(char * label,int flagDotDot)
 {
     int flag;             /*flag=0 is not valid label; flag=1 is valid label */
-    size_t i;
-    i= strlen(label);
+    size_t length;
+    length= strlen(label);
     flag=1;
     
     if(isInstruction(label,0)>=0)
         flag=0;
     else
     {
-        if(i>30) flag=0;
         int k;
-        if ((int)label[0]>= 48 && (int)label[0]<=57)
+
+        if ((length>30)||(!isGoodLetter(label[0])))
             return 0;
-        for ( k = 0; k < (i-1+(!flagDotDot)) && (flag); k++)
+        
+        for (k = 0;k < (length-1+(!flagDotDot))&&(flag); k++)
         {
             if (!isGoodLetter(label[k]))
                 flag=0;
         }
-        k++;
         if ((flagDotDot)&&(label[k]!=':'))
             flag=0;
     }
@@ -134,14 +135,18 @@ int isInstruction(char * order, int flagMessage)
 /*Int Function: search and return the index of the given label from the symbol table, if not exist return -1*/
 int findSymbol(char * data)
 {
+    int i;
     Symbol * temp;
-    temp=*symbol_table;
     
-    while(temp)
+    i=0;
+    while((symbol_table+i))
     {
+        temp=*(symbol_table+i);
+
         if(strcmp(temp->label_name,data)==0)
             return temp->dec_value;
-        temp++;
+        
+        i++;
     }
     
     return -1;
@@ -279,7 +284,7 @@ int isValidMatrixToData(char * mat)
     
     if((balance!=0)||(numOfBrac!=4))
     {
-    Failure: insertNewError("Invalid syntex in line: ");
+    Failure: insertNewError("Invalid declaring matrix in Line: %d");
              free(num);
              if(value)
                free(value);

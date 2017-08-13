@@ -8,7 +8,7 @@
 
 
 
-void insertToItForOperand(char ** data,int operand)
+void insertToItForOperand(char * data,int operand)
 {
     int * value;
     char ** mat_data;
@@ -16,29 +16,40 @@ void insertToItForOperand(char ** data,int operand)
     InstructRegisters regOrder;
     
     
-    
     if((operand==0)||(operand==3))
     {
-        value=isNumeric(data[0]+1);
+        value=isNumeric(data+1);
         dataOrder.value=*value;
     }
     
     
     dataOrder.type_coding=0;
-    instructions_table[IC]=(InstructData *)malloc(sizeof(InstructData));
-    instructions_table[IC]=&dataOrder;
+    instructions_table[IC]=(Instruction *)malloc(sizeof(Instruction));
+    allocate_check(instructions_table[IC]);
+
+    instructions_table[IC]->order=(InstructData *)malloc(sizeof(InstructData));
+    allocate_check(instructions_table[IC]->order);
+
+    *(((InstructData *)(instructions_table[IC]->order)))=dataOrder;
+    instructions_table[IC]->type_order=1;
     IC++;
     
     if(operand==2)
     {
-        mat_data=isValidMatrix(data[0]);
+        mat_data=isValidMatrix(data);
         regOrder.reg1=(*isNumeric((mat_data[1]+1)));
         regOrder.reg2=(*isNumeric((mat_data[2]+1)));
         regOrder.type_coding=0;
-        instructions_table[IC]=(InstructRegisters *)malloc(sizeof(InstructRegisters));
-        instructions_table[IC]=&regOrder;
+        instructions_table[IC]=(Instruction *)malloc(sizeof(Instruction));
+        allocate_check(instructions_table[IC]);
+
+        instructions_table[IC]->order=(InstructRegisters *)malloc(sizeof(InstructRegisters));
+        allocate_check(instructions_table[IC]->order);
+
+        *(((InstructRegisters *)(instructions_table[IC]->order)))=regOrder;
+        instructions_table[IC]->type_order=2;
         IC++;
-        freeLinkedList(data);
+        freeLinkedList(mat_data);
 
     }
     
@@ -58,10 +69,18 @@ void insertToItForOperand(char ** data,int operand)
 void insertSymbolToTable(char *data,int type)
 {
     Symbol* temp;
+    
     temp = (Symbol*)malloc(sizeof(Symbol));
     allocate_check(temp);
+    
+    temp->label_name=(char *)calloc(sizeof(char), strlen(data)-1);
+    allocate_check((temp->label_name));
+    
+    strcpy(temp->label_name, data);
+    /*need to add check for the copy operation*/
+    
+    (temp->label_name)[strlen(data)-1]='\0';
     temp->type = type;
-    temp->label_name = data;
     temp->dec_value=DC;
     
     if(findSymbol(data)!=-1)
@@ -118,38 +137,54 @@ void insertToIT(char **data,int Instruc_type)
                goto Failure;
         }
     }
-    /*if the instruct type is sole place*/
-    if (((Instruc_type>=NOT)&&(Instruc_type<=CLR))||((Instruc_type>=INC)&&(Instruc_type<=JSR)))
-    {
-        if((orgOperand!=-2)||(destOperand==-2))
-            goto Failure;
+    
+    else
+    {   /*if the instruct type is sole place*/
+        if (((Instruc_type>=NOT)&&(Instruc_type<=CLR))||((Instruc_type>=INC)&&(Instruc_type<=JSR)))
+        {
+            if((orgOperand!=-2)||(destOperand==-2))
+                goto Failure;
         
-        if((Instruc_type!=PRN)&&(destOperand==0))
-            goto Failure;
+            if((Instruc_type!=PRN)&&(destOperand==0))
+                goto Failure;
+        }
+        else  /*In the condition of Instruc_type==rts or Instruc_type==stop */
+        {
+            if((orgOperand!=-2)||(destOperand!=-2))
+                goto Failure;
+        }
     }
-    else  /*In the condition of Instruc_type==rts or Instruc_type==stop */
-    {
-        if((orgOperand!=-2)||(destOperand!=-2))
-            goto Failure;
-    }
-    
-    
     /*if the operand/s are valid then: */
     order.type_coding=0;
     order.origin_addressing=orgOperand;
     order.dest_addressing=destOperand;
     order.opcode=Instruc_type;
     
+    if(!instructions_table){
+        instructions_table=(Instruction **)malloc(sizeof(Instruction *));
+        allocate_check(instructions_table);
+    }
     
-    instructions_table[IC]=(InstructOrder *)malloc(sizeof(InstructOrder));
-    instructions_table[IC]=&order;
+    
+    instructions_table=(Instruction **)realloc(instructions_table, IC+1);
+    allocate_check(instructions_table);
+    
+    instructions_table[IC]=(Instruction *)malloc(sizeof(Instruction));
+    allocate_check(instructions_table[IC]);
+
+    instructions_table[IC]->order=(InstructOrder *)malloc(sizeof(InstructOrder));
+    allocate_check(instructions_table[IC]->order);
+
+    *(((InstructOrder *)(instructions_table[IC]->order)))=order;
+    instructions_table[IC]->type_order=0;
+
     IC++;
 
     if(orgOperand!=-2)
-        insertToItForOperand(data,orgOperand);
+        insertToItForOperand(data[0],orgOperand);
     
     if(destOperand!=-2)
-        insertToItForOperand(data,destOperand);
+        insertToItForOperand(data[1],destOperand);
     
 }
 

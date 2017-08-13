@@ -8,7 +8,7 @@
 
 
 Symbol ** symbol_table;               /*The symbols table*/
-void ** instructions_table;   /* for data and instruction order*/
+Instruction ** instructions_table;   /* for data and instruction order*/
 int * data_table;             /*Int dynamic array to store all the data instructions*/
 char ** ErrorsAssembler;     /*Error in the compiling*/
 unsigned IC;                 /*Instruction table counter*/
@@ -82,14 +82,17 @@ void insertNewError(char * error)
 /*function that free the linked list of strings*/
 void freeLinkedList(char ** list)
 {
-    while(*list)
+    while (list)
     {
-        free(*list);
-        list++;
+        if((*list)!=NULL)
+        {
+            free(*list);
+            list++;
+        }
+        else
+            list=NULL;
     }
 }
-
-
 
 
 
@@ -184,7 +187,7 @@ void FirstCheckingCommand(char ** command)
 
     
     /*In the case that the first string on the current command line is a label(symbol) */
-    if((isValidLabel((command[0]),1))&&((flag_symbol_type=isInstruction(command[1],1)>=0)))
+    if((isValidLabel((command[0]),1))&&(((flag_symbol_type=isInstruction(command[1],1))>=0)))
     {
         /*if the instrct type is an data or extern*/
         if(((flag_symbol_type>=DATA)&&(flag_symbol_type<=MAT))||(flag_symbol_type==EXTERN))
