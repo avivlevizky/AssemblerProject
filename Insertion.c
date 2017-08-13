@@ -8,10 +8,7 @@
 
 
 
-
-
-
-
+/*private function that create create/expand the Instruction table by type Of Order*/
 void createNewSpaceToITtable(int typeOfOrder)
 {
     Instruction **temp;
@@ -57,7 +54,7 @@ void createNewSpaceToITtable(int typeOfOrder)
 }
 
 
-
+/*private function ...*/
 void insertToItForOperand(char * data,int operand, int isOriginOperand)
 {
     int * value;
@@ -69,6 +66,8 @@ void insertToItForOperand(char * data,int operand, int isOriginOperand)
     /*If the given operand is register*/
     if(operand==3)
     {
+        regOrder.reg1=0;
+        regOrder.reg2=0;
         value=isNumeric(data+1);
         
         if(isOriginOperand)
@@ -146,7 +145,7 @@ void insertSymbolToTable(char *data,int type)
     temp->type = type;
     temp->dec_value=DC;
     
-    if(findSymbol(data)!=-1)
+    if(findSymbol(temp->label_name)!=-1)
         insertNewError("The symbol is already decleared in Line: %d");
     if (!symbol_table)
     {

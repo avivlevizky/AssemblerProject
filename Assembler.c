@@ -102,9 +102,10 @@ void CommandLineToLinkedList(int NumIteration)
 {
     char ** command;           /*dynamic matrix of strings*/
     char reader;              /*char variable to iterate on content std*/
-    int chars_len,word_counter,isComa,isQuot;      /*chars_len: the char length of the current word; word_counter: indicate in the current number of word; isComa: indicate if coma was encourted more than one time ; isQueat: indicate if quotation marks apeared for ignore the creation of new string */
+    int chars_len,word_counter,isComa,isQuot,ignore;      /*chars_len: the char length of the current word; word_counter: indicate in the current number of word; isComa: indicate if coma was encourted more than one time ; isQueat: indicate if quotation marks apeared for ignore the creation of new string */
     
     LC++;
+    ignore=0;
     reader='\0';
     word_counter=0;
     chars_len=1;
@@ -115,9 +116,11 @@ void CommandLineToLinkedList(int NumIteration)
     command[0]=(char *)calloc(1,sizeof(char));
     allocate_check(command[0]);
 
-    while(((reader=fgetc(fp))!=EOF)&&(reader!='\n'))
+Loop: while(((reader=fgetc(fp))!=EOF)&&(reader!='\n'))
     {
-        if((reader!=' ')&&((reader!=',')||(isComa)))
+        if((reader==';')&&(!word_counter)&&(chars_len==1))
+            ignore=1;
+        if((!ignore)&&((reader!=' ')&&((reader!=',')||(isComa))))
         {
             isQuot = (reader=='"') ? isQuot ^1 : isQuot;
             command[word_counter]=(char *)realloc((char *)(command[word_counter]), (chars_len+1)*sizeof(char));
@@ -143,6 +146,12 @@ void CommandLineToLinkedList(int NumIteration)
             
         }
     }
+    if(ignore)
+    {
+        LC++;
+        ignore=0;
+        goto Loop;
+    }
     /*Assign in the last+1 place a null (to indicate the end of the current command) */
     if(chars_len>1)
     {
@@ -167,7 +176,6 @@ void CommandLineToLinkedList(int NumIteration)
             FirstCheckingCommand(command);
         else
             SecondCheckingCommand(command);
-        freeLinkedList(command);
     }
 }
 

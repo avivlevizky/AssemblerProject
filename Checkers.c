@@ -136,16 +136,12 @@ int isInstruction(char * order, int flagMessage)
 int findSymbol(char * data)
 {
     int i;
-    Symbol * temp;
     
     i=0;
-    while((symbol_table+i))
+    while(i<SC)
     {
-        temp=*(symbol_table+i);
-
-        if(strcmp(temp->label_name,data)==0)
-            return temp->dec_value;
-        
+        if(strcmp(symbol_table[i]->label_name,data)==0)
+            return symbol_table[i]->dec_value;
         i++;
     }
     
