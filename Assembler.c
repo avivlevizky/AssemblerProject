@@ -54,7 +54,7 @@ int lenOfNum(int n)
 void insertNewError(char * error)
 {
     char *message =(char *)malloc(strlen(error)+lenOfNum(LC)+1);
-    sprintf(message, error, LC); // puts string into buffer
+    sprintf(message, error, LC); /*( puts string into buffer */
     message[strlen(error)+lenOfNum(LC)]='\0';
     
     
