@@ -54,7 +54,7 @@ int lenOfNum(int n)
 void insertNewError(char * error)
 {
     char *message =(char *)malloc(strlen(error)+lenOfNum(LC)+1);
-    sprintf(message, error, LC); /*( puts string into buffer */
+    sprintf(message, error, LC); // puts string into buffer
     message[strlen(error)+lenOfNum(LC)]='\0';
     
     
@@ -176,6 +176,7 @@ Loop: while(((reader=fgetc(fp))!=EOF)&&(reader!='\n'))
             FirstCheckingCommand(command);
         else
             SecondCheckingCommand(command);
+        
     }
 }
 
@@ -275,7 +276,7 @@ int main(int argc,char ** argv) {
     LC=0;
     DC=0;
     
-    fp = fopen ("argv[0]", "r");
+    fp = fopen ("argv[1]", "r");
     
     if(!fp)
     {
@@ -292,6 +293,7 @@ int main(int argc,char ** argv) {
     if (EC>0)
     {
         /*Print all the compile error from ErrorsAssembler and exit*/
+
     }
     
     /*Second checking of the assembly*/
