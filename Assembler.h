@@ -24,7 +24,7 @@ typedef struct
 
 typedef struct
 {
-    char value;
+    char value: 8;
     unsigned int type_coding: 2;
 }InstructData;
 
@@ -48,7 +48,7 @@ typedef enum {MOV,CMP,ADD,SUB,NOT,CLR,LEA,INC,DEC,JMP,BNE,RED,PRN,JSR,RTS,STOP,D
 typedef struct
 {
     char * label_name;
-    char dec_value;
+    unsigned int dec_value:8;
     func type;      /*boolean variable: data order or instruction order*/
     
 }Symbol;

@@ -14,7 +14,7 @@ int isGoodLetter (char toTest){
     tester = (int)toTest;
     if( (tester>= 65 && tester<=90) || (tester>= 97 && tester<=122) || (tester>= 48 && tester<=57))
         return 1;
-
+    
     return 0;
 }
 
@@ -38,7 +38,7 @@ int isValidLabel(char * label,int flagDotDot)
     else
     {
         int k;
-
+        
         if ((length>30)||(!isGoodLetter(label[0])))
             return 0;
         
@@ -61,6 +61,9 @@ int isValidLabel(char * label,int flagDotDot)
 /*flagMessage: indicate if to print an error message or not*/
 int isInstruction(char * order, int flagMessage)
 {
+    if(!order)
+        goto Failure;
+    
     if (strcmp(order,"mov")==0){
         return 0;
     }
@@ -125,8 +128,8 @@ int isInstruction(char * order, int flagMessage)
         return 20;
     }
     
-    if(flagMessage)
-        insertNewError("Invalid instruction in line: %d");
+Failure:if(flagMessage)
+            insertNewError("Invalid instruction in line: %d");
     return -1;
 }
 
@@ -137,7 +140,11 @@ int findSymbol(char * data)
 {
     int i;
     
+    if(!data)
+        return -1;
+    
     i=0;
+    
     while(i<SC)
     {
         if(strcmp(symbol_table[i]->label_name,data)==0)
@@ -163,7 +170,7 @@ int * isNumeric(char * data)
     length=(int)strlen(data);
     value=(int *)malloc(sizeof(int));
     allocate_check(value);
-
+    
     if(data[0]=='-')
         signMinus++;
     
@@ -199,7 +206,7 @@ int isDirectOrRegister(char * data)
         int *value;
         value=isNumeric(data+1);
         
-
+        
         if((!value)||((data[0]=='r')&&((*value<0)||(*value>7)))) /*if the operand is reg and the domain value is out of bounds-> return -1*/
             return -1;
         
@@ -232,7 +239,7 @@ int isValidMatrixToData(char * mat)
     
     num=(char *)calloc(1,sizeof(char));
     allocate_check(num);
-
+    
     
     while((balance>=0)&&((reader=mat[i])!='\0'))
     {
@@ -249,7 +256,7 @@ int isValidMatrixToData(char * mat)
             if((!value)||(*value<=0)) /*if value ==null and the next char after '#' isn't '0' then value is an error*/
             {
                 goto Failure;
-
+                
             }
             else
             {
@@ -281,10 +288,10 @@ int isValidMatrixToData(char * mat)
     if((balance!=0)||(numOfBrac!=4))
     {
     Failure: insertNewError("Invalid declaring matrix in Line: %d");
-             free(num);
-             if(value)
-               free(value);
-             return -1;
+        free(num);
+        if(value)
+            free(value);
+        return -1;
     }
     
     return ans;
@@ -317,10 +324,10 @@ char ** isValidMatrix(char * mat)
     
     matFixed=(char **)malloc(sizeof(char *));
     allocate_check(matFixed);
-
+    
     matFixed[0]=(char *)calloc(1,sizeof(char));
     allocate_check(matFixed[0]);
-
+    
     while((balance>=0)&&((reader=mat[i])!='\0'))
     {
         if(reader=='[')
@@ -349,7 +356,7 @@ char ** isValidMatrix(char * mat)
         {
             if(isDirectOrRegister(matFixed[wordCounter])!=3)
             {
-               /*insertNewError("Invalid register in index array line: %d");*/
+                /*insertNewError("Invalid register in index array line: %d");*/
                 freeLinkedList(matFixed);
                 return NULL;
             }
@@ -411,8 +418,8 @@ int checkAddressingType(char * data)
     
     if(!data)
         return -2;
-   
-
+    
+    
     addrType=isDirectOrRegister(data);
     
     if(addrType==-1)
@@ -422,13 +429,12 @@ int checkAddressingType(char * data)
         else
             addrType=(isValidLabel(data, 0))  ? 1 : -1;
     }
-
+    
     
     freeLinkedList(mat_data);
     return addrType;
     
 }
-
 
 
 

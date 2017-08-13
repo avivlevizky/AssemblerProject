@@ -163,7 +163,7 @@ Loop: while(((reader=fgetc(fp))!=EOF)&&(reader!='\n'))
     
     if(reader=='\n')
     {
-        if(NumIteration)
+        if(NumIteration==1)
             FirstCheckingCommand(command);
         else
             SecondCheckingCommand(command);
@@ -172,7 +172,7 @@ Loop: while(((reader=fgetc(fp))!=EOF)&&(reader!='\n'))
     }
     else   /*if c is EOF*/
     {
-        if(NumIteration)
+        if(NumIteration==1)
             FirstCheckingCommand(command);
         else
             SecondCheckingCommand(command);
@@ -213,7 +213,7 @@ void FirstCheckingCommand(char ** command)
     }
     else /*if the commands[0] isn't label*/
     {
-        if ((flag_symbol_type=isInstruction(command[0],1))>=0)
+        if ((flag_symbol_type=isInstruction(command[0],0))>=0)
         {
             if((flag_symbol_type>=DATA)&&(flag_symbol_type<=MAT))
             {
@@ -257,7 +257,14 @@ void SecondCheckingCommand(char ** command)
     if((flag_symbol_type=isInstruction(command[flag],1))==19)
     {
         /*In the case that the second string is .entry*/
-        insertSymbolToTable(command[0],flag_symbol_type);   /*need to assign the current label(symbol) as an .entry in the symbol table*/
+        int index;
+        
+        index=findSymbol(command[flag+1]);
+        
+        if(index==-1)
+            insertNewError("The entry symbol defining isn't valid: %d");
+        else
+            symbol_table[index]->type=ENTRY;
     }
     else if(flag_symbol_type<=15)
     {

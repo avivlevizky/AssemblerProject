@@ -82,7 +82,7 @@ void insertToItForOperand(char * data,int operand, int isOriginOperand)
         
         return;
     }
-
+    
     
     /*If the given operand is label,mat or direct addressing*/
     if(operand==0)
@@ -105,18 +105,44 @@ void insertToItForOperand(char * data,int operand, int isOriginOperand)
         regOrder.reg1=(*isNumeric((mat_data[1]+1)));
         regOrder.reg2=(*isNumeric((mat_data[2]+1)));
         
-
+        
         /*allocate new place registers coding*/
         createNewSpaceToITtable(3);
         *(((InstructRegisters *)(instructions_table[IC]->order)))=regOrder;
         instructions_table[IC]->type_order=2;
         IC++;
         freeLinkedList(mat_data);
-
+        
     }
     
 }
 
+
+
+
+void insertToItForOperandSecond(char * data,int operand)
+{
+    int index;
+    char *label;
+    if(operand==2)
+        label=(isValidMatrix(data))[0];
+    
+    index=findSymbol(data);
+
+    if(index==-1)
+        insertNewError("Symbol isn't decleared in Line: %d");
+    else
+    {
+        ((InstructData*)(instructions_table[IC]->order))->value=index;
+        if((symbol_table[index]->type)==EXTERN)
+            ((InstructData*)(instructions_table[IC]->order))->type_coding=1;
+        else
+            ((InstructData*)(instructions_table[IC]->order))->type_coding=2;
+    }
+    
+    IC=IC+operand;
+    
+}
 
 
 
@@ -143,23 +169,26 @@ void insertSymbolToTable(char *data,int type)
     
     (temp->label_name)[strlen(data)-1]='\0';
     temp->type = type;
-    temp->dec_value=DC;
     
+    if(type==EXTERN)
+        temp->dec_value=0;
+    else
+        temp->dec_value=DC;
+
     if(findSymbol(temp->label_name)!=-1)
         insertNewError("The symbol is already decleared in Line: %d");
     if (!symbol_table)
     {
         symbol_table = (Symbol **)malloc(sizeof(Symbol*));
         allocate_check(symbol_table);
-        *symbol_table = temp;
     }
     else
     {
         symbol_table = (Symbol **)realloc(symbol_table,SC+1);
         allocate_check(symbol_table);
-        symbol_table[SC]=temp;
     }
-    
+    symbol_table[SC]=temp;
+
     SC++;
     
 }
@@ -183,12 +212,12 @@ void insertToIT(char **data,int Instruc_type)
     orgOperand=checkAddressingType(data[0]);
     if(orgOperand!=-2)
         destOperand=checkAddressingType(data[1]);
-
+    
     
     if((orgOperand==-1)||(destOperand==-1))
     {
-        Failure: insertNewError("Invalid operands in Line: %d");
-                 return;
+    Failure: insertNewError("Invalid operands in Line: %d");
+        return;
     }
     
     /*if the instruct type is dual places*/
@@ -204,8 +233,8 @@ void insertToIT(char **data,int Instruc_type)
         }
         else
         {
-           if((Instruc_type!=CMP)&&(destOperand==0))
-               goto Failure;
+            if((Instruc_type!=CMP)&&(destOperand==0))
+                goto Failure;
         }
     }
     
@@ -215,7 +244,7 @@ void insertToIT(char **data,int Instruc_type)
         {
             if((orgOperand==-2)||(destOperand!=-2))
                 goto Failure;
-        
+            
             if((Instruc_type!=PRN)&&(destOperand==0))
                 goto Failure;
         }
@@ -235,7 +264,7 @@ void insertToIT(char **data,int Instruc_type)
     *(((InstructOrder *)(instructions_table[IC]->order)))=order;
     instructions_table[IC]->type_order=0;
     IC++;
-
+    
     /*if both of the operands are registers*/
     if((orgOperand==3)&&(destOperand==3))
     {
@@ -248,7 +277,7 @@ void insertToIT(char **data,int Instruc_type)
         *(((InstructRegisters *)(instructions_table[IC]->order)))=regOrder;
         instructions_table[IC]->type_order=2;
         IC++;
-
+        
     }
     else
     {
@@ -325,7 +354,7 @@ void insertToDT(char **data,int type)
                 i++;
             }
             insertNewError("The string defining missing \" token in Line: %d");
-
+            
             
         }
             break;
@@ -343,7 +372,7 @@ void insertToDT(char **data,int type)
             }
             
             i=0;
-
+            
             while((reader=data[i+1]))
             {
                 value=isNumeric(reader);
@@ -371,9 +400,30 @@ void insertToDT(char **data,int type)
 /*Update the given instruction command for the second checking*/
 void updateInstruction(char **data,int Instruc_type)
 {
+    int orgOperand,destOperand;
+    
+    destOperand=-2;
+    orgOperand=checkAddressingType(data[0]);
+    
+    if(orgOperand!=-2)
+        destOperand=checkAddressingType(data[1]);
+
+    
+    IC++;
+
+    
+    if((orgOperand==1)||(orgOperand==2))
+        insertToItForOperandSecond(data[0],orgOperand);
+        
+    if((destOperand==1)||(destOperand==2))
+        insertToItForOperandSecond(data[1],destOperand);
     
     
 }
+
+
+    
+    
 
 
 
