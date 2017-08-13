@@ -111,7 +111,7 @@ void insertToItForOperand(char * data,int operand, int isOriginOperand)
         *(((InstructRegisters *)(instructions_table[IC]->order)))=regOrder;
         instructions_table[IC]->type_order=2;
         IC++;
-        freeLinkedList(mat_data);
+        freeLinkedList(mat_data,3);
         
     }
     
@@ -126,14 +126,15 @@ void insertToItForOperandSecond(char * data,int operand)
     char *label;
     if(operand==2)
         label=(isValidMatrix(data))[0];
-    
-    index=findSymbol(data);
+    else
+        label=data;
+    index=findSymbol(label);
 
     if(index==-1)
         insertNewError("Symbol isn't decleared in Line: %d");
     else
     {
-        ((InstructData*)(instructions_table[IC]->order))->value=index;
+        ((InstructData*)(instructions_table[IC]->order))->value=symbol_table[index]->dec_value;
         if((symbol_table[index]->type)==EXTERN)
             ((InstructData*)(instructions_table[IC]->order))->type_coding=1;
         else

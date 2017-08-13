@@ -148,7 +148,7 @@ int findSymbol(char * data)
     while(i<SC)
     {
         if(strcmp(symbol_table[i]->label_name,data)==0)
-            return symbol_table[i]->dec_value;
+            return i;
         i++;
     }
     
@@ -337,7 +337,7 @@ char ** isValidMatrix(char * mat)
                 if(!isValidLabel(matFixed[0],0))
                 {
                     /*insertNewError("Invalid Label of matrix in line: %d");*/
-                    freeLinkedList(matFixed);
+                    freeLinkedList(matFixed,wordCounter);
                     return NULL;
                 }
             }
@@ -346,7 +346,7 @@ char ** isValidMatrix(char * mat)
                 if(prevReader!=']')
                 {
                     /*insertNewError("Invalid syntex in line: %d");*/
-                    freeLinkedList(matFixed);
+                    freeLinkedList(matFixed,wordCounter);
                     return NULL;
                 }
             }
@@ -357,7 +357,7 @@ char ** isValidMatrix(char * mat)
             if(isDirectOrRegister(matFixed[wordCounter])!=3)
             {
                 /*insertNewError("Invalid register in index array line: %d");*/
-                freeLinkedList(matFixed);
+                freeLinkedList(matFixed,wordCounter);
                 return NULL;
             }
             
@@ -399,7 +399,7 @@ char ** isValidMatrix(char * mat)
     if((balance!=0)||(wordCounter!=3))
     {
         /*insertNewError("Invalid syntex in line: %d");*/
-        freeLinkedList(matFixed);
+        freeLinkedList(matFixed,wordCounter);
         return NULL;
     }
     
@@ -431,7 +431,7 @@ int checkAddressingType(char * data)
     }
     
     
-    freeLinkedList(mat_data);
+    freeLinkedList(mat_data,3);
     return addrType;
     
 }

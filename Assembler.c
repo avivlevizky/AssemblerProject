@@ -80,18 +80,20 @@ void insertNewError(char * error)
 
 
 /*function that free the linked list of strings*/
-void freeLinkedList(char ** list)
+void freeLinkedList(char ** list,int length)
 {
-    while (list)
+    int i;
+    
+    i=0;
+    while((i<length)&&((list)!=NULL))
     {
-        if((*list)!=NULL)
-        {
-            free(*list);
-            list++;
-        }
-        else
-            list=NULL;
+        *list=NULL;
+        free(*list);
+        list++;
+        i++;
+        
     }
+    
 }
 
 
@@ -167,7 +169,7 @@ Loop: while(((reader=fgetc(fp))!=EOF)&&(reader!='\n'))
             FirstCheckingCommand(command);
         else
             SecondCheckingCommand(command);
-        freeLinkedList(command);
+        freeLinkedList(command,word_counter);
         CommandLineToLinkedList(NumIteration);
     }
     else   /*if c is EOF*/

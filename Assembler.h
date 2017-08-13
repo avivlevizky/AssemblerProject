@@ -57,7 +57,7 @@ typedef struct
 
 void insertNewError(char * error);
 void allocate_check(void * p);
-void freeLinkedList(char ** list);
+void freeLinkedList(char ** list,int length);
 
 
 
