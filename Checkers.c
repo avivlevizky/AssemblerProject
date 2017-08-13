@@ -329,7 +329,7 @@ char ** isValidMatrix(char * mat)
             {
                 if(!isValidLabel(matFixed[0],0))
                 {
-                    //insertNewError("Invalid Label of matrix in line: %d");
+                    /*insertNewError("Invalid Label of matrix in line: %d");*/
                     freeLinkedList(matFixed);
                     return NULL;
                 }
@@ -338,7 +338,7 @@ char ** isValidMatrix(char * mat)
             {
                 if(prevReader!=']')
                 {
-                    //insertNewError("Invalid syntex in line: %d");
+                    /*insertNewError("Invalid syntex in line: %d");*/
                     freeLinkedList(matFixed);
                     return NULL;
                 }
@@ -349,7 +349,7 @@ char ** isValidMatrix(char * mat)
         {
             if(isDirectOrRegister(matFixed[wordCounter])!=3)
             {
-                //insertNewError("Invalid register in index array line: %d");
+               /*insertNewError("Invalid register in index array line: %d");*/
                 freeLinkedList(matFixed);
                 return NULL;
             }
@@ -391,7 +391,7 @@ char ** isValidMatrix(char * mat)
     
     if((balance!=0)||(wordCounter!=3))
     {
-        //insertNewError("Invalid syntex in line: %d");
+        /*insertNewError("Invalid syntex in line: %d");*/
         freeLinkedList(matFixed);
         return NULL;
     }

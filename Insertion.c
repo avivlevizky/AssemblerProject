@@ -300,7 +300,7 @@ void insertToDT(char **data,int type)
         case STRING: /*if the type is .string*/
         {
             char ch;
-            // need to check when reader is null
+            /* need to check when reader is null */
             reader=data[0];
             
             if ((!reader[0])||(reader[0]!='"'))
