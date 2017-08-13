@@ -232,7 +232,7 @@ void FirstCheckingCommand(char ** command)
             }
         }
         else
-            insertNewError("Undifined command line: ");
+            insertNewError("Undifined command line: %d");
         
     }
 }
@@ -293,6 +293,15 @@ int main(int argc,char ** argv) {
     if (EC>0)
     {
         /*Print all the compile error from ErrorsAssembler and exit*/
+        int i;
+        
+        i=0;
+        
+        while(i<EC)
+        {
+            printf("%s\n",ErrorsAssembler[i]);
+        }
+        return 1;
 
     }
     
@@ -304,6 +313,16 @@ int main(int argc,char ** argv) {
     if (EC>0)
     {
         /*Print all the compile error from ErrorsAssembler and exit*/
+        int i;
+        
+        i=0;
+        
+        while(i<EC)
+        {
+            printf("%s\n",ErrorsAssembler[i]);
+        }
+        return 1;
+
     }
     
     return 0;
