@@ -411,7 +411,19 @@ void updateInstruction(char **data,int Instruc_type)
 
     
     IC++;
-
+    
+    if((orgOperand==3)&&(destOperand==3))
+    {
+        IC++;
+        return;
+    }
+    
+    if((orgOperand==0)||(orgOperand==3))
+        IC++;
+    
+    if((destOperand==0)||(destOperand==3))
+        IC++;
+        
     
     if((orgOperand==1)||(orgOperand==2))
         insertToItForOperandSecond(data[0],orgOperand);
