@@ -136,26 +136,20 @@ void insertToItForOperandSecond(char * data,int operand)
     {
         if((operand)==((symbol_table[index]->type)-16))
         {
-            InstructData temp;
+            InstructData *temp;
             
-            temp=*((InstructData*)(instructions_table[IC]->order));
-
-            temp.value=symbol_table[index]->dec_value;
-            /*((InstructData*)(instructions_table[IC]->order))->value=symbol_table[index]->dec_value;*/
+            temp=((InstructData*)(instructions_table[IC]->order));
+            temp->value=symbol_table[index]->dec_value;
             
             if((symbol_table[index]->type)==EXTERN)
-                temp.type_coding=1;
+                temp->type_coding=1;
             else
-                temp.type_coding=2;
-            
+                temp->type_coding=2;
         }
         else
-        {
             insertNewError("The symbol isn't matched to the type of the decleared symbol Line: %d");
-            
-            
-        }
-    IC=IC+operand;
+        
+        IC=IC+operand;
     }
 }
 
