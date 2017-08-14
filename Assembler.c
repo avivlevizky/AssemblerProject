@@ -11,8 +11,8 @@ Symbol ** symbol_table;               /*The symbols table*/
 Instruction ** instructions_table;   /* for data and instruction order*/
 char ** ErrorsAssembler;     /*Error in the compiling*/
 int * data_table;             /*Int dynamic array to store all the data instructions*/
-static int * symbolType_to_entry;             /*table that save all the indexes of the entrys labels*/
-static unsigned SymbolEntry;                 /*Data table counter*/
+int * symbolType_to_entry;             /*table that save all the indexes of the entrys labels*/
+unsigned SymbolEntry;                 /*Data table counter*/
 unsigned IC;                 /*Instruction table counter*/
 unsigned Total_IC;           /*total of Instructions after the first iteration*/
 unsigned DC;                 /*Data table counter*/
