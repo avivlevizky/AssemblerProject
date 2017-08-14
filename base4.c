@@ -1,5 +1,6 @@
-
-
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 char * base4 (int i) {
 
@@ -23,11 +24,12 @@ char * base4 (int i) {
     k++;
 
     while (i > 0){
+        printf("k is %d and i is %d res is %d ans ans is %s\n",k,i,res,ans);
 
         temp = (char*)realloc(ans,k);
         if (!temp) {
-            printf("\ncannot allocate memory for base4 function\n");
-            printf("\npreform exit\n");
+            printf("\ncannot allocate memory for base4 function - k is %d and i is %d\n",k,i);
+            printf("preform exit\n");
             exit(0);
         }
         else
@@ -44,13 +46,24 @@ char * base4 (int i) {
         i = i/4;
 
     }
+    ans[k+1]='\0';
 
     return ans;
 }
 
 
+int main ( ){
+
+    char *p;
+    int i = 100;
+
+    p = base4(i);
+    printf("%s",p);
 
 
+    return 1;
+
+}
 
 
 
