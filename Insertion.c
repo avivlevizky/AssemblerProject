@@ -398,6 +398,8 @@ void insertToDT(char **data,int type)
     
 }
 
+
+
 /*Update the given instruction command for the second checking*/
 void updateInstruction(char **data,int Instruc_type)
 {
@@ -418,18 +420,19 @@ void updateInstruction(char **data,int Instruc_type)
         return;
     }
     
-    if((orgOperand==0)||(orgOperand==3))
-        IC++;
-    
-    if((destOperand==0)||(destOperand==3))
-        IC++;
-        
-    
     if((orgOperand==1)||(orgOperand==2))
         insertToItForOperandSecond(data[0],orgOperand);
-        
+    else
+        IC++;
+    
     if((destOperand==1)||(destOperand==2))
         insertToItForOperandSecond(data[1],destOperand);
+    else
+        IC++;
+        
+    
+
+        
     
     
 }
