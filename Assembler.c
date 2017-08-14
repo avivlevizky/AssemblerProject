@@ -11,6 +11,8 @@ Symbol ** symbol_table;               /*The symbols table*/
 Instruction ** instructions_table;   /* for data and instruction order*/
 char ** ErrorsAssembler;     /*Error in the compiling*/
 int * data_table;             /*Int dynamic array to store all the data instructions*/
+static int * symbolType_to_entry;             /*table that save all the indexes of the entrys labels*/
+static unsigned SymbolEntry;                 /*Data table counter*/
 unsigned IC;                 /*Instruction table counter*/
 unsigned Total_IC;           /*total of Instructions after the first iteration*/
 unsigned DC;                 /*Data table counter*/
@@ -178,7 +180,15 @@ Loop: while(((reader=fgetc(fp))!=EOF)&&(reader!='\n'))
         if(NumIteration==1)
             FirstCheckingCommand(command);
         else
+        {
             SecondCheckingCommand(command);
+            while((SymbolEntry>0)&&(EC==0))
+            {
+                int index;
+                index=symbolType_to_entry[--SymbolEntry];
+                symbol_table[index]->type=ENTRY;
+            }
+        }
         
     }
 }
@@ -267,13 +277,22 @@ void SecondCheckingCommand(char ** command)
         if(index==-1)
             insertNewError("The entry symbol defining isn't valid: %d");
         else
-            symbol_table[index]->type=ENTRY;
+        {
+            symbolType_to_entry[SymbolEntry]=index;
+            SymbolEntry++;
+        }
     }
     else if(flag_symbol_type<=15)
     {
         updateInstruction(&command[flag+1],flag_symbol_type);   /*the command[2] is first operand*/
     }
 }
+
+
+
+
+
+
 
 
 
@@ -318,10 +337,13 @@ int main(int argc,char ** argv) {
     }
     
     /*Second checking of the assembly*/
+    symbolType_to_entry=(int *)malloc(sizeof(int)*SC);
+    SymbolEntry=0;
     Total_IC=IC;
     IC=0;
     LC=0;
     CommandLineToLinkedList(2);
+    free(symbolType_to_entry);
     
     if (EC>0)
     {
