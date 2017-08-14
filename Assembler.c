@@ -125,7 +125,8 @@ Loop: while(((reader=fgetc(fp))!=EOF)&&(reader!='\n'))
     {
         if((reader==';')&&(!word_counter)&&(chars_len==1))
             ignore=1;
-        if((!ignore)&&((reader!=' ')&&((reader!=',')||(isComa))))
+        
+        if((!ignore)&&((reader!=' ')&&(reader!='\t')&&((reader!=',')||(isComa))))
         {
             isQuot = (reader=='"') ? isQuot ^1 : isQuot;
             command[word_counter]=(char *)realloc((char *)(command[word_counter]), (chars_len+1)*sizeof(char));
