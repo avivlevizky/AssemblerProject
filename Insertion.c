@@ -134,7 +134,7 @@ void insertToItForOperandSecond(char * data,int operand)
         insertNewError("Symbol isn't decleared in Line: %d");
     else
     {
-        if(((operand==1)&&(((symbol_table[index]->type)==DATA)||((symbol_table[index]->type)==STRING)))||((operand==2)&&((symbol_table[index]->type)==MAT)))
+        if(((operand==1)&&(((symbol_table[index]->type)==DATA)||((symbol_table[index]->type)==STRING)||((symbol_table[index]->type)==EXTERN)))||((operand==2)&&((symbol_table[index]->type)==MAT)))
         {
             InstructData *temp;
             
