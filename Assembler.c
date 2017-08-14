@@ -285,7 +285,7 @@ int main(int argc,char ** argv) {
     LC=0;
     DC=0;
     
-    fp = fopen ("argv[1]", "r");
+    fp = fopen (argv[1], "r");
     
     if(!fp)
     {
@@ -309,6 +309,8 @@ int main(int argc,char ** argv) {
         while(i<EC)
         {
             printf("%s\n",ErrorsAssembler[i]);
+            i++;
+
         }
         return 1;
 
@@ -329,6 +331,8 @@ int main(int argc,char ** argv) {
         while(i<EC)
         {
             printf("%s\n",ErrorsAssembler[i]);
+            i++;
+
         }
         return 1;
 
