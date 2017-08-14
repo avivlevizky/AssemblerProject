@@ -53,22 +53,17 @@ int lenOfNum(int n)
 /*fucntion that insert new assembler error into ErrorsAssembler table */
 void insertNewError(char * error)
 {
-    char *message =(char *)malloc(strlen(error)+lenOfNum(LC)+1);
-    sprintf(message, error, LC); /*( puts string into buffer */
-    message[strlen(error)+lenOfNum(LC)]='\0';
-    
-    
     if (!EC)
     {
         ErrorsAssembler=(char **)malloc(sizeof(char *));
         allocate_check((char **)ErrorsAssembler);
     }
-    else
-    {
-        ErrorsAssembler=(char **)realloc((char **)ErrorsAssembler, (EC+1)*sizeof(char *));
-        allocate_check(ErrorsAssembler);
-    }
-    ErrorsAssembler[EC]=message;
+    ErrorsAssembler=(char **)realloc((char **)ErrorsAssembler, (EC+1)*sizeof(char *));
+    allocate_check(ErrorsAssembler);
+    
+    ErrorsAssembler[EC]=(char *)malloc(strlen(error)+lenOfNum(LC)+1);
+    sprintf(ErrorsAssembler[EC], error, LC); /*( puts string into buffer */
+    ErrorsAssembler[EC][strlen(error)+lenOfNum(LC)]='\0';
     EC++;
     
     
@@ -233,8 +228,8 @@ void FirstCheckingCommand(char ** command)
                 insertToIT(&command[1],flag_symbol_type);  /*the command[1] is first operand*/
             }
         }
-        else
-            insertNewError("Unidentified command line: %d");
+        else if(!isValidLabel((command[0]),1))
+                insertNewError("Unidentified command line: %d");
         
     }
 }
@@ -334,7 +329,7 @@ int main(int argc,char ** argv) {
             i++;
 
         }
-        return 1;
+        return 2;
 
     }
     

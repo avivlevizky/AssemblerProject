@@ -421,7 +421,7 @@ void updateInstruction(char **data,int Instruc_type)
     
     if(orgOperand!=-2)
         destOperand=checkAddressingType(data[1]);
-
+    
     
     IC++;
     
@@ -431,23 +431,24 @@ void updateInstruction(char **data,int Instruc_type)
         return;
     }
     
-    if((orgOperand==1)||(orgOperand==2))
-        insertToItForOperandSecond(data[0],orgOperand);
-    else
-        IC++;
+    if(orgOperand!=-2)
+    {
+        if((orgOperand==1)||(orgOperand==2))
+            insertToItForOperandSecond(data[0],orgOperand);
+        else
+            IC++;
+    }
     
-    if((destOperand==1)||(destOperand==2))
-        insertToItForOperandSecond(data[1],destOperand);
-    else
-        IC++;
-        
-    
-
-        
+    if(destOperand!=-2)
+    {
+        if((destOperand==1)||(destOperand==2))
+            insertToItForOperandSecond(data[1],destOperand);
+        else
+            IC++;
+    }
     
     
 }
-
 
     
     

@@ -129,7 +129,7 @@ int isInstruction(char * order, int flagMessage)
     }
     
 Failure:if(flagMessage)
-            insertNewError("Invalid instruction in line: %d");
+            insertNewError("Invalid or missing instruction in line: %d");
     return -1;
 }
 
