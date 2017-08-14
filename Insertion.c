@@ -139,7 +139,7 @@ void insertToItForOperandSecond(char * data,int operand)
             InstructData *temp;
             
             temp=((InstructData*)(instructions_table[IC]->order));
-            temp->value=symbol_table[index]->dec_value+Total_IC;
+            temp->value=(symbol_table[index]->dec_value)+Total_IC;
             
             if((symbol_table[index]->type)==EXTERN)
             {
