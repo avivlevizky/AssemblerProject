@@ -134,15 +134,29 @@ void insertToItForOperandSecond(char * data,int operand)
         insertNewError("Symbol isn't decleared in Line: %d");
     else
     {
-        ((InstructData*)(instructions_table[IC]->order))->value=symbol_table[index]->dec_value;
-        if((symbol_table[index]->type)==EXTERN)
-            ((InstructData*)(instructions_table[IC]->order))->type_coding=1;
+        if((operand)==((symbol_table[index]->type)-16))
+        {
+            InstructData temp;
+            
+            temp=*((InstructData*)(instructions_table[IC]->order));
+
+            temp.value=symbol_table[index]->dec_value;
+            /*((InstructData*)(instructions_table[IC]->order))->value=symbol_table[index]->dec_value;*/
+            
+            if((symbol_table[index]->type)==EXTERN)
+                temp.type_coding=1;
+            else
+                temp.type_coding=2;
+            
+        }
         else
-            ((InstructData*)(instructions_table[IC]->order))->type_coding=2;
-    }
-    
+        {
+            insertNewError("The symbol isn't matched to the type of the decleared symbol Line: %d");
+            
+            
+        }
     IC=IC+operand;
-    
+    }
 }
 
 
@@ -373,10 +387,7 @@ void insertToDT(char **data,int type)
             n=isValidMatrixToData(data[0]);
             
             if(n==-1)
-            {
-                insertNewError("The matrix defining isn't valid in Line: %d");
                 return;
-            }
             
             i=0;
             
