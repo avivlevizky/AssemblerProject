@@ -234,7 +234,7 @@ void FirstCheckingCommand(char ** command)
             }
         }
         else
-            insertNewError("Undifined command line: %d");
+            insertNewError("Unidentified command line: %d");
         
     }
 }
