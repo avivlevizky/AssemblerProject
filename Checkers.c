@@ -163,7 +163,7 @@ int findSymbol(char * data)
     
     i=0;
     
-    while(i<SC)
+    while((i<SC)&&(symbol_table[i]))
     {
         if(strcmp(symbol_table[i]->label_name,data)==0)
             return i;
