@@ -129,17 +129,17 @@ int * isNumeric(char * data)
 void freeLinkedList(char ** list,int length)
 {
     int i;
-    
+    char ** temp;
     i=0;
-    while((i<length)&&((list)!=NULL))
+    while(i<length && list)
     {
-        *list=NULL;
-        free(*list);
-        list++;
+        free(list[i]);
+
         i++;
-        
+
     }
-    
+
+    free(list);
 }
 
 
@@ -246,7 +246,7 @@ void insertToItForOperand(char * data,int operand, int isOriginOperand)
         *(((InstructRegisters *)(instructions_table[IC]->order)))=regOrder;
         instructions_table[IC]->type_order=2;
         IC++;
-        
+        free(value);
         return;
     }
     
@@ -284,9 +284,9 @@ void insertToItForOperand(char * data,int operand, int isOriginOperand)
         instructions_table[IC]->type_order=2;
         IC++;
         freeLinkedList(mat_data,3);
-        
+
     }
-    
+    free(value);
 }
 
 
@@ -312,10 +312,11 @@ int checkAddressingType(char * data)
             addrType=2;
         else
             addrType=(isValidLabel(data, 0))  ? 1 : -1;
+        freeLinkedList(mat_data,3);
+
     }
     
     
-    freeLinkedList(mat_data,3);
     return addrType;
     
 }
@@ -472,8 +473,10 @@ void insertSymbolToTable(char *data,int type)
     else
         temp->dec_value=DC;
     
-    if(findSymbol(temp->label_name)!=-1)
+    if(findSymbol(temp->label_name)!=-1){
         insertNewError("The symbol is already decleared in Line: %d");
+        free(temp);
+    }
     if (!symbol_table)
     {
         symbol_table = (Symbol **)malloc(sizeof(Symbol*));
@@ -481,11 +484,13 @@ void insertSymbolToTable(char *data,int type)
     }
     else
     {
-        symbol_table = (Symbol **)realloc(symbol_table,SC+1);
-        allocate_check(symbol_table);
+        Symbol ** temp_ST;
+        temp_ST=(Symbol **)malloc(sizeof(Symbol*)*(SC+1));
+        allocate_check(temp_ST);
+        memmove(temp_ST,symbol_table,sizeof(Symbol*)*(SC));
+        symbol_table=temp_ST;
     }
     symbol_table[SC]=temp;
-    
     SC++;
     
 }
@@ -570,16 +575,24 @@ Loop: while(((reader=fgetc(fp))!=EOF)&&(reader!='\n'))
             FirstCheckingCommand(command);
         else
         {
+            int i;
             SecondCheckingCommand(command);
+            i=0;
             while((SymbolEntry>0)&&(EC==0))
             {
                 int index;
                 index=symbolType_to_entry[--SymbolEntry];
                 symbol_table[index]->type=ENTRY;
+
             }
+            while(i<SymbolEntry)
+            {
+                free(symbolType_to_entry[i]);
+            }
+            free(symbolType_to_entry);
         }
 
-        
+        freeLinkedList(command,word_counter);
     }
 }
 
@@ -892,7 +905,7 @@ char ** isValidMatrix(char * mat)
             {
                 if(!isValidLabel(matFixed[0],0))
                 {
-                    //insertNewError("Invalid Label of matrix in line: %d");
+
                     freeLinkedList(matFixed,wordCounter);
                     return NULL;
                 }
@@ -901,7 +914,7 @@ char ** isValidMatrix(char * mat)
             {
                 if(prevReader!=']')
                 {
-                    //insertNewError("Invalid syntex in line: %d");
+
                     freeLinkedList(matFixed,wordCounter);
                     return NULL;
                 }
@@ -912,7 +925,7 @@ char ** isValidMatrix(char * mat)
         {
             if(isDirectOrRegister(matFixed[wordCounter])!=3)
             {
-                //insertNewError("Invalid register in index array line: %d");
+
                 freeLinkedList(matFixed,wordCounter);
                 return NULL;
             }
@@ -924,8 +937,12 @@ char ** isValidMatrix(char * mat)
             if(chars_len>1)
             {
                 wordCounter++;
-                matFixed=(char **)realloc((char **)matFixed, (wordCounter+1)*sizeof(char *));
-                allocate_check(matFixed);
+
+                char ** temp_mat;
+                temp_mat=(char **)malloc(sizeof(char*)*(wordCounter+1));
+                allocate_check(temp_mat);
+                memmove(temp_mat,matFixed,sizeof(char*)*(wordCounter));
+                matFixed=temp_mat;
                 matFixed[wordCounter]=(char *)calloc(1,sizeof(char));
                 allocate_check(matFixed[wordCounter]);
                 chars_len=1;
@@ -934,8 +951,11 @@ char ** isValidMatrix(char * mat)
         }
         else
         {
-            matFixed[wordCounter]=(char *)realloc((char *)(matFixed[wordCounter]), (chars_len+1)*sizeof(char));
-            allocate_check(matFixed[wordCounter]);
+            char * temp_st;
+            temp_st=(char *)malloc((chars_len+1)*sizeof(char));
+            allocate_check(temp_st);
+            memmove(temp_st,matFixed[wordCounter],(chars_len)*sizeof(char));
+            matFixed[wordCounter]=temp_st;
             matFixed[wordCounter][chars_len-1]=reader;
             matFixed[wordCounter][chars_len]='\0';
             chars_len++;
@@ -947,14 +967,17 @@ char ** isValidMatrix(char * mat)
     if(chars_len>1)
     {
         wordCounter++;
-        matFixed=(char **)realloc((char **)matFixed, (wordCounter+1)*sizeof(char *));
-        allocate_check(matFixed);
+        char ** temp_mat;
+        temp_mat=(char **)malloc(sizeof(char*)*(wordCounter+1));
+        allocate_check(temp_mat);
+        memmove(temp_mat,matFixed,sizeof(char*)*(wordCounter));
+        matFixed=temp_mat;
     }
     matFixed[wordCounter]=NULL;
     
     if((balance!=0)||(wordCounter!=3))
     {
-        //insertNewError("Invalid syntex in line: %d");
+
         freeLinkedList(matFixed,wordCounter);
         return NULL;
     }
@@ -1022,8 +1045,12 @@ int isValidMatrixToData(char * mat)
         }
         else
         {
-            num=(char *)realloc((char *)(num), (chars_len+1)*sizeof(char));
-            allocate_check(num);
+            char * temp_st;
+
+            temp_st=(char *)malloc((chars_len+1)*sizeof(char));
+            allocate_check(temp_st);
+            memmove(temp_st,num,(chars_len)*sizeof(char));
+            num=temp_st;
             num[chars_len-1]=reader;
             num[chars_len]='\0';
             chars_len++;
@@ -1060,7 +1087,7 @@ void insertToDT(char **data,int type)
     char *reader;
     
     i=0;
-    
+    value = NULL;
     switch (type) {
         case DATA: /*if the type is .data*/
         {
@@ -1070,9 +1097,15 @@ void insertToDT(char **data,int type)
                 if(!value)
                 {
                     insertNewError("The data defining isn't valid in Line: %d");
+                    free(value);
                     return;
                 }
-                data_table=(int*)realloc(data_table,DC+1);
+
+                int * temp_data;
+                temp_data=(int *)malloc(sizeof(int)*(DC+1));
+                allocate_check(temp_data);
+                memmove(temp_data,data_table,sizeof(int)*DC);
+                data_table=temp_data;
                 data_table[DC]=*value;
                 DC++;
                 i++;
@@ -1084,7 +1117,7 @@ void insertToDT(char **data,int type)
         case STRING: /*if the type is .string*/
         {
             char ch;
-            // need to check when reader is null
+
             reader=data[0];
             
             if ((!reader[0])||(reader[0]!='"'))
@@ -1103,7 +1136,11 @@ void insertToDT(char **data,int type)
                     return;
                     
                 }
-                data_table=(int*)realloc(data_table,DC+1);
+                int * temp_data;
+                temp_data=(int *)malloc(sizeof(int)*(DC+1));
+                allocate_check(temp_data);
+                memmove(temp_data,data_table,sizeof(int)*DC);
+                data_table=temp_data;
                 data_table[DC]= ch;
                 DC++;
                 i++;
@@ -1134,15 +1171,20 @@ void insertToDT(char **data,int type)
                     free(value);
                     return;
                 }
-                
-                data_table=(int*)realloc(data_table,DC+1);
+
+                int * temp_data;
+                temp_data=(int *)malloc(sizeof(int)*(DC+1));
+                allocate_check(temp_data);
+                memmove(temp_data,data_table,sizeof(int)*DC);
+                data_table=temp_data;
                 data_table[DC]=*value;
                 free(value);
                 DC++;
                 i++;
             }
-            if (i!=n)
+            if (i!=n){
                 insertNewError("The defining matrix values are not equel to declaring matrix: %d");
+                free(value);}
         }
             break;
     }
@@ -1247,14 +1289,16 @@ void updateInstruction(char **data,int Instruc_type)
 
 
 int main() {
+
+    int i;
     InstructOrder test0;
     InstructData test1;
     InstructRegisters test2;
     Instruction * wh;
     Symbol sy;
-
     LC=0;
     DC=0;
+    i=0;
     fp = fopen ("test.txt", "r");
     
     if(!fp)
@@ -1291,43 +1335,30 @@ int main() {
     Total_IC=IC;
     IC=0;
     LC=0;
-    free(symbolType_to_entry);
+
+
     
     
     
-    CommandLineToLinkedList(2);
-    
+   CommandLineToLinkedList(2);
+
     if (EC>0)
     {
-        /*Print all the compile error from ErrorsAssembler and exit*/
-        int i;
-        
-        i=0;
-        
-        while(i<EC)
-        {
-            printf("%s\n",ErrorsAssembler[i]);
-            i++;
-        }
-        return 2;
-        
+
+    i=0;
+
+    while(i<EC)
+    {
+        printf("%s\n",ErrorsAssembler[i]);
+        i++;
     }
+    return 2;
+
+}
 
 
-    //matS=isValidMatrix(str);
-    
-    
-    //value=isValidMatrixToData(str);
-    
-    //int * p= isNumeric("-453");
-    
 
-    //printf("%d\n",test.reg1);
-
-    
-
-   
-     printf("%d\n",((InstructOrder *)instructions_table[0]->order)->type_coding);
+printf("%d\n",((InstructOrder *)instructions_table[0]->order)->type_coding);
      printf("%d\n",((InstructOrder *)instructions_table[0]->order)->origin_addressing);
      printf("%d\n",((InstructOrder *)instructions_table[0]->order)->dest_addressing);
      printf("%d\n",((InstructOrder *)instructions_table[0]->order)->opcode);
@@ -1352,17 +1383,11 @@ int main() {
     printf("%d\n",reg.reg2);
     
     putchar('\n');
-    
-    wh=instructions_table[3];
-    printf("The type is: %d\n",wh->type_order);
-    da=*((InstructData*)(wh->order));
-    printf("%d\n",da.value);
-    printf("%d\n",da.type_coding);
-    
 
-    
+
     return 0;
 }
+
 
 
 
