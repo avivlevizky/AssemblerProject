@@ -158,17 +158,23 @@ void insertToItForOperandSecond(char * data,int operand)
 void insertSymbolToTable(char *data,int type)
 {
     Symbol* temp;
-    
+    int isDotDot;
+
+    isDotDot=0;
+    if(data[strlen(data)-1]==':')
+        isDotDot=1;
+
     temp = (Symbol*)malloc(sizeof(Symbol));
     allocate_check(temp);
     
-    temp->label_name=(char *)calloc(sizeof(char), strlen(data)-1);
+    
+    temp->label_name=(char *)calloc(sizeof(char), strlen(data)-isDotDot);
     allocate_check((temp->label_name));
     
     strcpy(temp->label_name, data);
     /*need to add check for the copy operation*/
     
-    (temp->label_name)[strlen(data)-1]='\0';
+    (temp->label_name)[strlen(temp->label_name)-isDotDot]='\0';
     temp->type = type;
     
     if(type==EXTERN)
