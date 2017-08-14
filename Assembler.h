@@ -73,10 +73,10 @@ int * data_table;             /*Int dynamic array to store all the data instruct
 Instruction ** instructions_table;   /* for data and instruction order*/
 unsigned IC;                 /*Instruction table counter*/
 unsigned SC;                 /*Symbol counter*/
-char ** ErrorsAssembler;     /*Error in the compiling*/
 unsigned EC;                 /*Error counter*/
 unsigned LC;                 /*Line counter*/
 unsigned DC;                 /*Data table counter*/
+unsigned Total_IC;           /*total of Instructions after the first iteration*/
 
 
 

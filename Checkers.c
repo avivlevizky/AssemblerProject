@@ -5,6 +5,24 @@
 #include <stdio.h>
 #include <math.h>
 
+/*declaration of all the extern variables*/
+
+/*
+extern Symbol ** symbol_table;               
+extern int * data_table;
+extern Instruction ** instructions_table;
+extern unsigned IC;
+extern unsigned SC;
+extern unsigned EC;
+extern unsigned LC;
+extern unsigned DC;
+extern unsigned Total_IC;
+*/
+
+
+
+
+
 
 
 /*Private Aux function: which indicate if the given char is an alpha-bet charcter*/

@@ -9,19 +9,24 @@
 
 Symbol ** symbol_table;               /*The symbols table*/
 Instruction ** instructions_table;   /* for data and instruction order*/
-int * data_table;             /*Int dynamic array to store all the data instructions*/
 char ** ErrorsAssembler;     /*Error in the compiling*/
+int * data_table;             /*Int dynamic array to store all the data instructions*/
 unsigned IC;                 /*Instruction table counter*/
+unsigned Total_IC;           /*total of Instructions after the first iteration*/
 unsigned DC;                 /*Data table counter*/
 unsigned SC;                 /*Symbol counter*/
 unsigned EC;                 /*Error counter*/
 unsigned LC;                 /*Line counter*/
-unsigned word_counter;
-FILE * fp;                           /*FILE pointer to the given assembly file*/
+FILE * fp;                    /*FILE pointer to the given assembly file*/
 
 
+/*Prototyps*/
 void FirstCheckingCommand(char **);
 void SecondCheckingCommand(char ** command);
+
+
+
+
 
 
 /*fucntion that checks if the new memory allocate was successed, if not the function will print to stderr a new error message and then will exit the program*/
@@ -50,6 +55,10 @@ int lenOfNum(int n)
 }
 
 
+
+
+
+
 /*fucntion that insert new assembler error into ErrorsAssembler table */
 void insertNewError(char * error)
 {
@@ -65,9 +74,6 @@ void insertNewError(char * error)
     sprintf(ErrorsAssembler[EC], error, LC); /*( puts string into buffer */
     ErrorsAssembler[EC][strlen(error)+lenOfNum(LC)]='\0';
     EC++;
-    
-    
-    
     
 }
 
@@ -312,6 +318,7 @@ int main(int argc,char ** argv) {
     }
     
     /*Second checking of the assembly*/
+    Total_IC=IC;
     IC=0;
     LC=0;
     CommandLineToLinkedList(2);
