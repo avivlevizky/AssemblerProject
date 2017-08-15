@@ -8,23 +8,6 @@
 
 
 
-/*Private Aux function: which indicate if the given char is an alpha-bet charcter*/
-int isGoodLetter(char toTest) {
-	int tester;
-	tester = toTest;
-
-	if ((tester >= 65 && tester <= 90) || (tester >= 97 && tester <= 122) || (tester >= 48 && tester <= 57))
-		return 1;
-	return 0;
-}
-
-
-
-
-/*******************************************************************************************************************************/
-
-
-
 /*Bool Function that checks if the label is valid by return boolean value, if will be an error the function will insert the match error into ErrorsAssembler table */
 int isValidLabel(char * label, int flagDotDot)
 {
