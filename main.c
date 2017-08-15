@@ -174,18 +174,20 @@ void insertNewError(char * error)
 
 void createNewSpaceToITtable(int typeOfOrder)
 {
-    Instruction **temp;
+    /*Instruction **temp;*/
     if(!instructions_table){
         instructions_table=(Instruction **)malloc(sizeof(Instruction *));
         allocate_check(instructions_table);
     }
     
-    temp=(Instruction **)malloc(sizeof(Instruction**)*(IC+1));
+    /*temp=(Instruction **)malloc(sizeof(Instruction*)*(IC+1));
     allocate_check(temp);
-
     memmove(temp,instructions_table,IC*sizeof(Instruction**));
+    instructions_table=temp;*/
     
-    instructions_table=temp;
+    instructions_table=(Instruction **)realloc(instructions_table,sizeof(Instruction*)*(IC+1));
+    allocate_check(instructions_table);
+    
     instructions_table[IC]=(Instruction *)malloc(sizeof(Instruction));
     allocate_check(instructions_table[IC]);
     
@@ -298,7 +300,7 @@ void insertToItForOperand(char * data,int operand, int isOriginOperand)
 int checkAddressingType(char * data)
 {
     int addrType;
-    char ** mat_data = NULL;
+    
     
     if(!data)
         return -2;
@@ -308,6 +310,7 @@ int checkAddressingType(char * data)
     
     if(addrType==-1)
     {
+        char ** mat_data = NULL;
         if((mat_data=isValidMatrix(data)))
             addrType=2;
         else
@@ -484,11 +487,11 @@ void insertSymbolToTable(char *data,int type)
     }
     else
     {
-        Symbol ** temp_ST;
+        /*Symbol ** temp_ST;
         temp_ST=(Symbol **)malloc(sizeof(Symbol*)*(SC+1));
         allocate_check(temp_ST);
         memmove(temp_ST,symbol_table,sizeof(Symbol*)*(SC));
-        symbol_table=temp_ST;
+        symbol_table=temp_ST;*/
     }
     symbol_table[SC]=temp;
     SC++;
