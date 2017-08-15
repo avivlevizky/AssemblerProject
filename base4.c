@@ -1,4 +1,8 @@
-char * base4 (int i, int j) {
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+
+char * base4 (int i, int j, int active) {  /* i - number to convert, j - how many digits , active - reverse or not*/
     int res;
     int k;
     int f;
@@ -32,16 +36,31 @@ char * base4 (int i, int j) {
         exit(0);
     }
 
-    while (i > 0){
+    while (i > 0){                          /*Creating to base4 string*/
         res = i%4;
         i=i/4;
-
+                                            /*converting process*/
         if(res == 0){ans[k++] = 'a';}
         else if(res == 1){ans[k++] = 'b';}
         else if(res == 2){ans[k++] = 'c';}
         else if(res == 3){ans[k++] = 'd';}
 
 
+        temp = (char*)realloc(ans,(k+1));  /*increasing the string dynamically*/
+        if (!temp) {
+            printf("\ncannot allocate memory for base4 function");
+            printf("preform exit\n");
+            exit(0);
+        }
+        else
+        {
+            ans = temp;
+
+        }
+    }
+
+    if (active)                             /*indicate if reverse the base4 code or not*/
+    {
         temp = (char*)realloc(ans,(k+1));
         if (!temp) {
             printf("\ncannot allocate memory for base4 function");
@@ -55,31 +74,19 @@ char * base4 (int i, int j) {
         }
 
 
-
-    }
-    temp = (char*)realloc(ans,(k+1));
-    if (!temp) {
-        printf("\ncannot allocate memory for base4 function");
-        printf("preform exit\n");
-        exit(0);
-    }
-    else
-    {
+        temp = (char *)malloc(sizeof(char)*(k+1));
+        for(f = 0; f < k; f++)
+        {
+            temp[f] = ans[(k-1)-f];
+        }
+        temp[k]='\0';
+        free(ans);
         ans = temp;
 
     }
 
-
-    temp = (char *)malloc(sizeof(char)*(k+1));
-    for(f = 0; f < k; f++)
-    {
-        temp[f] = ans[(k-1)-f];
-    }
-    temp[k]='\0';
-    free(ans);
-    ans = temp;
     length = strlen(ans);
-    if (j > length){
+    if (j > length){                        /*padding the string with the requested amount of a's*/
         temp1 = (char *)malloc(sizeof(char)*(j+1));
         for (f = 0; f < j; f++)
         {
@@ -98,3 +105,25 @@ char * base4 (int i, int j) {
     }
     return ans;
 }
+
+
+int main ( ){
+
+    char *p;
+
+    p = base4(100,8,1);
+    printf("\n%s\n",p);
+
+
+    return 1;
+
+}
+
+
+
+
+
+
+
+
+
