@@ -1,5 +1,6 @@
 
 #include <stdlib.h>
+#include <ctype.h>
 #include <string.h>
 #include <stdio.h>
 #include "Assembler.h"
@@ -125,7 +126,7 @@ Loop: while (((reader = fgetc(fp)) != EOF) && (reader != '\n'))
 {
 	if ((reader == ';') && (!word_counter) && (chars_len == 1))
 		ignore = 1;
-	if ((!ignore) && ((reader != ' ') && (reader != '\t') && ((reader != ',') || (isComa))))
+	if ((!ignore) && ((!isspace(reader)) && ((reader != ',') || (isComa))))
 	{
 		char * temp;
 		isQuot = (reader == '"') ? isQuot ^ 1 : isQuot;

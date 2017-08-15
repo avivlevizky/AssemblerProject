@@ -37,12 +37,12 @@ int isValidLabel(char * label, int flagDotDot)
 	{
 		int k;
 
-		if ((length>30) || (!isGoodLetter(label[0])))
+		if ((length>30) || (!isalpha(label[0])))
 			return 0;
 
 		for (k = 0; k < (length - 1 + (!flagDotDot)) && (flag); k++)
 		{
-			if (!isGoodLetter(label[k]))
+			if (!isalpha(label[k]))
 				flag = 0;
 		}
 		if ((flagDotDot) && (label[k] != ':'))

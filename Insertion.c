@@ -7,7 +7,6 @@
 #include <stdio.h>
 
 
-
 /*private function that create/expand the Instruction table by type Of Order*/
 void createNewSpaceToITtable(int typeOfOrder)
 {
