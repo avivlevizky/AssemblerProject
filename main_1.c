@@ -1289,8 +1289,11 @@ int main() {
 	InstructRegisters test2;
 	Instruction * wh;
 	Symbol sy;
-	LC = 0;
-	DC = 0;
+       IC=0;
+    SC=0;
+    EC=0;
+    LC=0;
+    DC=0;
 	i = 0;
 	fp = fopen("test.txt", "r");
 
