@@ -61,7 +61,7 @@ void CreateNewSpaceForDT()
 
 	if (!data_table)
 	{
-		data_table = (int *)malloc(data_table, sizeof(int));
+		data_table = (int *)malloc(sizeof(int));
 		allocate_check(data_table);
 	}
 	else
