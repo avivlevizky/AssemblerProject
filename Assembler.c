@@ -315,6 +315,7 @@ void SecondCheckingCommand(char ** command)
 int main(int argc,char ** argv) {
     /*Function to check the validity of the inputed arguments*/
     /*********************************************************/
+	char *temp;
     IC=0;
     SC=0;
     EC=0;
@@ -375,8 +376,61 @@ int main(int argc,char ** argv) {
 
         }
         return 2;
-
     }
+
+	/*
+	i = 0;
+	output = fopen("output.txt", "w");
+	while (i < IC)
+	{
+		char ans[6] = "";
+		addr = base4(IC + 100);
+
+		if ((instructions_table[i]->type_order) == 0)
+		{
+
+			temp = base4(((InstructOrder *)instructions_table[i]->order)->type_coding);
+			strcat(ans, temp);
+			free(temp);
+			temp = base4(((InstructOrder *)instructions_table[i]->order)->origin_addressing);
+			strcat(ans, temp);
+			free(temp);
+			temp = base4(((InstructOrder *)instructions_table[i]->order)->dest_addressing);
+			strcat(ans, temp);
+			free(temp);
+			temp = base4(((InstructOrder *)instructions_table[i]->order)->opcode);
+			strcat(ans, temp);
+			free(temp);
+		}
+		if ((instructions_table[i]->type_order) == 1)
+		{
+			temp = base4(((InstructData*)instructions_table[i]->order)->type_coding);
+			strcat(ans, temp);
+			free(temp);
+			temp = base4(((InstructData*)instructions_table[i]->type_order)->value);
+			strcat(ans, temp);
+			free(temp);
+		}
+		if ((instructions_table[i]->type_order) == 2)
+		{
+			strcat(ans, "a");
+			temp = base4(((InstructRegisters*)instructions_table[i]->order)->reg2);
+			strcat(ans, temp);
+			free(temp);
+			temp = base4(((InstructRegisters*)instructions_table[i]->type_order)->reg1);
+			strcat(ans, temp);
+			free(temp);
+		}
+
+		fprintf(output, "%s    %s", addr, value);
+		i++;
+	}
+	*/
+
+
+
+
+
     
     return 0;
     
