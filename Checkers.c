@@ -1,9 +1,11 @@
 #include <stdlib.h>
-#include "Checkers.h"
-#include "Assembler.h"
+#include <ctype.h>
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
+#include "Checkers.h"
+#include "Assembler.h"
+
 
 
 /*Private Aux function: which indicate if the given char is an alpha-bet charcter*/
