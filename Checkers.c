@@ -27,7 +27,7 @@ int isValidLabel(char * label, int flagDotDot)
 
 		for (k = 0; k < (length - 1 + (!flagDotDot)) && (flag); k++)
 		{
-			if (!isalpha(label[k]))
+			if (!isalnum(label[k]))
 				flag = 0;
 		}
 		if ((flagDotDot) && (label[k] != ':'))
@@ -312,7 +312,7 @@ char ** isValidMatrix(char * mat)
 				if (!isValidLabel(matFixed[0], 0))
 				{
 
-					freeLinkedList(matFixed, wordCounter);
+					freeLinkedList(matFixed);
 					return NULL;
 				}
 			}
@@ -321,7 +321,7 @@ char ** isValidMatrix(char * mat)
 				if (prevReader != ']')
 				{
 
-					freeLinkedList(matFixed, wordCounter);
+					freeLinkedList(matFixed);
 					return NULL;
 				}
 			}
@@ -332,7 +332,7 @@ char ** isValidMatrix(char * mat)
 			if (isDirectOrRegister(matFixed[wordCounter]) != 3)
 			{
 
-				freeLinkedList(matFixed, wordCounter);
+				freeLinkedList(matFixed);
 				return NULL;
 			}
 
@@ -380,7 +380,7 @@ char ** isValidMatrix(char * mat)
 
 	if ((balance != 0) || (wordCounter != 3))
 	{
-		freeLinkedList(matFixed, wordCounter);
+		freeLinkedList(matFixed);
 		return NULL;
 	}
 
@@ -407,7 +407,7 @@ int checkAddressingType(char * data)
 			addrType = 2;
 		else
 			addrType = (isValidLabel(data, 0)) ? 1 : -1;
-		freeLinkedList(mat_data, 3);
+		freeLinkedList(mat_data);
 	}
 	return addrType;
 }

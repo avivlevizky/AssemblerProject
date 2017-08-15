@@ -13,7 +13,9 @@ Instruction ** instructions_table;   /* for data and instruction order*/
 char ** ErrorsAssembler;     /*Error in the compiling*/
 int * data_table;             /*Int dynamic array to store all the data instructions*/
 int * symbolType_to_entry;             /*table that save all the indexes of the entrys labels*/
-unsigned SymbolEntry;                 /*Data table counter*/
+ExternSy ** ExterSymbols;             /*table that save all the indexes of the externs labels*/
+unsigned SymbolEntry;                 /*entry symbols counter*/
+unsigned SymbolExtern;                 /*extern symbols counter*/
 unsigned IC;                 /*Instruction table counter*/
 unsigned Total_IC;           /*total of Instructions after the first iteration*/
 unsigned DC;                 /*Data table counter*/
@@ -26,6 +28,9 @@ FILE * fp;                    /*FILE pointer to the given assembly file*/
 /*Prototyps*/
 void FirstCheckingCommand(char **);
 void SecondCheckingCommand(char ** command);
+
+
+
 
 
 
@@ -87,10 +92,9 @@ void insertNewError(char * error)
 
 
 /*function that free the linked list of strings*/
-void freeLinkedList(char ** list, int length)
+void freeLinkedList(char ** list)
 {
 	int i;
-	char ** temp;
 	i = 0;
 	while (list && list[i])
 	{
@@ -112,7 +116,6 @@ void CommandLineToLinkedList(int NumIteration)
 
 	LC++;
 	ignore = 0;
-	reader = '\0';
 	word_counter = 0;
 	chars_len = 1;
 	isComa = 0;
@@ -179,7 +182,7 @@ Loop: while (((reader = fgetc(fp)) != EOF) && (reader != '\n'))
 			  FirstCheckingCommand(command);
 		  else
 			  SecondCheckingCommand(command);
-		  freeLinkedList(command, word_counter);
+		  freeLinkedList(command);
 		  CommandLineToLinkedList(NumIteration);
 	  }
 	  else   /*if c is EOF*/
@@ -188,23 +191,20 @@ Loop: while (((reader = fgetc(fp)) != EOF) && (reader != '\n'))
 			  FirstCheckingCommand(command);
 		  else
 		  {
-			  int i;
+              int counterEntry;
+              counterEntry=0;
 			  SecondCheckingCommand(command);
-			  i = 0;
-			  while ((SymbolEntry>0) && (EC == 0))
+			  while ((!EC)&&(counterEntry<SymbolEntry))
 			  {
 				  int index;
-				  index = symbolType_to_entry[--SymbolEntry];
+				  index = symbolType_to_entry[counterEntry];
 				  symbol_table[index]->type = ENTRY;
+                  counterEntry++;
 			  }
-			  free(symbolType_to_entry);
 		  }
-		  freeLinkedList(command, word_counter);
+		  freeLinkedList(command);
 	  }
 }
-
-
-
 
 
 
@@ -227,8 +227,16 @@ void FirstCheckingCommand(char ** command)
 		/*if the instrct type is an data or extern*/
 		if (((flag_symbol_type >= DATA) && (flag_symbol_type <= MAT)) || (flag_symbol_type == EXTERN))
 		{
-			insertSymbolToTable(command[0], flag_symbol_type);
-			insertToDT(&command[2], flag_symbol_type);
+
+            if(flag_symbol_type != EXTERN)
+            {
+                insertSymbolToTable(command[0], flag_symbol_type);
+                insertToDT(&command[2], flag_symbol_type);
+            }
+            else
+                insertSymbolToTable(command[2], EXTERN);
+
+
 		}
 		/*if the instrct type is an instruction*/
 		else if (flag_symbol_type <= 15)
@@ -250,7 +258,7 @@ void FirstCheckingCommand(char ** command)
 			if (flag_symbol_type >= 19)
 			{
 				if (flag_symbol_type == 20) /*if is .extern insruct type then we will enter the command into the symbol table*/
-					insertSymbolToTable(command[1], flag_symbol_type);
+                    insertSymbolToTable(command[1], flag_symbol_type);
 			}
 			else
 			{
@@ -304,39 +312,31 @@ void SecondCheckingCommand(char ** command)
 	}
 }
 
-char * base4 (int i, int j) {
-    int res;
-    int k;
-    int f;
-    int length;
+
+
+
+char * base4 (int i, int j)
+{
+    int res,k,f,length;
     char * temp;
     char * temp1;
     char * ans ;
+
     k = 0;
 
     if (i == 0){
         ans = (char *)malloc(sizeof(char)*(j+1));
-        if (!ans) {
-            printf("\ncannot allocate memory for base4 function\n");
-            printf("\npreform exit\n");
-            exit(0);}
+        allocate_check(ans);
         ans[0] = 'a';
-        for(f = 1; f < j; f++){
+        for(f = 1; f < j; f++)
             ans[f]='a';
 
-        }
         ans[f] = '\0';
         return ans;
-
-
     }
 
     ans = (char *)malloc(sizeof(char)*(k+1));
-    if (!ans) {
-        printf("\ncannot allocate memory for base4 function\n");
-        printf("\npreform exit\n");
-        exit(0);
-    }
+    allocate_check(ans);
 
     while (i > 0){
         res = i%4;
@@ -349,71 +349,181 @@ char * base4 (int i, int j) {
 
 
         temp = (char*)realloc(ans,(k+1));
-        if (!temp) {
-            printf("\ncannot allocate memory for base4 function");
-            printf("preform exit\n");
-            exit(0);
-        }
-        else
-        {
-            ans = temp;
-
-        }
-
-
-
-    }
-    temp = (char*)realloc(ans,(k+1));
-    if (!temp) {
-        printf("\ncannot allocate memory for base4 function");
-        printf("preform exit\n");
-        exit(0);
-    }
-    else
-    {
+        allocate_check(ans);
         ans = temp;
-
     }
 
-
+    temp = (char*)realloc(ans,(k+1));
+    allocate_check(temp);
+    ans = temp;
     temp = (char *)malloc(sizeof(char)*(k+1));
+    allocate_check(temp);
+
     for(f = 0; f < k; f++)
-    {
         temp[f] = ans[(k-1)-f];
-    }
+
     temp[k]='\0';
     free(ans);
     ans = temp;
     length = strlen(ans);
-    if (j > length){
+
+    if (j > length)
+    {
         temp1 = (char *)malloc(sizeof(char)*(j+1));
         for (f = 0; f < j; f++)
         {
             if (f <(j-length))
-            {
                 temp1[f] = 'a';
-            }
             else
-            {
                 temp1[f] = temp[f-(j-length)];
-            }
-
         }
-            free(ans);
-            return temp1;
+        free(ans);
+        return temp1;
     }
+
     return ans;
 }
 
 
 
 
+void printInstructionsToFile(FILE *output)
+{
+    int i;
+    char *temp;
+    char *addr;
+
+    i = 0;
+    while (i < IC)
+    {
+        char ans[6] = "";
+        addr = base4(i+100,4);
+
+        if ((instructions_table[i]->type_order) == 0)
+        {
+            temp = base4(((InstructOrder *)instructions_table[i]->order)->opcode,2);
+            strcat(ans, temp);
+            free(temp);
+            temp = base4(((InstructOrder *)instructions_table[i]->order)->origin_addressing,1);
+            strcat(ans, temp);
+            free(temp);
+            temp = base4(((InstructOrder *)instructions_table[i]->order)->dest_addressing,1);
+            strcat(ans, temp);
+            free(temp);
+            temp = base4(((InstructOrder *)instructions_table[i]->order)->type_coding,1);
+            strcat(ans, temp);
+            free(temp);
+
+        }
+        if ((instructions_table[i]->type_order) == 1)
+        {
+            temp = base4((((InstructData*)instructions_table[i]->order)->value)+100,4);
+            strcat(ans, temp);
+            free(temp);
+            temp = base4(((InstructData*)instructions_table[i]->order)->type_coding,1);
+            strcat(ans, temp);
+            free(temp);
+        }
+        if ((instructions_table[i]->type_order) == 2)
+        {
+            temp = base4(((InstructRegisters*)instructions_table[i]->order)->reg1,2);
+            strcat(ans, temp);
+            free(temp);
+            temp = base4(((InstructRegisters*)instructions_table[i]->order)->reg2,2);
+            strcat(ans, temp);
+            free(temp);
+            strcat(ans, "a");
+        }
+
+        fprintf(output, "%s    %s\n", addr, ans);
+        free(addr);
+        i++;
+    }
+
+}
 
 
 
 
 
+void printDataToFile(FILE *output)
+{
+    int i;
+    char *ans;
+    char *addr;
 
+    i = 100+IC;
+    while (i < DC+IC+100)
+    {
+        addr = base4(i,4);
+        ans = base4(data_table[i-100-IC],5);
+
+        fprintf(output, "%s    %s\n", addr, ans);
+        free(addr);
+        free(ans);
+        i++;
+    }
+
+}
+
+
+
+
+
+void cleanAllmem()
+{
+    int i;
+
+    i=0;
+
+    while(i<SC)
+    {
+        free(symbol_table[i]->label_name);
+        free(symbol_table[i]);
+        i++;
+    }
+
+    free(symbol_table);
+    i=0;
+
+    while(i<IC)
+    {
+        free(instructions_table[i]->order);
+        free(instructions_table[i]);
+        i++;
+    }
+
+    free(instructions_table);
+    i=0;
+
+    while(i<SymbolExtern)
+    {
+        free(ExterSymbols[i]->label_name);
+        free(ExterSymbols[i]);
+        i++;
+    }
+    free(ExterSymbols);
+
+
+
+
+    freeLinkedList(ErrorsAssembler);
+
+    free(data_table);
+
+    free(symbolType_to_entry);
+
+
+
+    SymbolExtern=0;
+    SymbolEntry=0;
+    IC=0;
+    SC=0;
+    EC=0;
+    LC=0;
+    DC=0;
+    Total_IC=0;
+}
 
 
 
@@ -428,127 +538,162 @@ char * base4 (int i, int j) {
 int main(int argc,char ** argv) {
     /*Function to check the validity of the inputed arguments*/
     /*********************************************************/
-	char *temp;
+    int argCounter;
+    FILE * objectFile;
+    FILE * entryFile;
+    FILE * externFile;
+
+    SymbolExtern=0;
+    SymbolEntry=0;
     IC=0;
     SC=0;
     EC=0;
     LC=0;
     DC=0;
-    
-    fp = fopen (argv[1], "r");
-    
-    if(!fp)
+    argCounter=1;
+
+
+    if(argc<2)
+        fprintf(stderr,"No entered .as file name\n");
+
+    while(argCounter<argc)
     {
-        fprintf(stderr,"File address isn't valid\n");
-        exit(0);
-    }
-    
-    /*First checking of the assembly*/
-    CommandLineToLinkedList(1);
-    
-    /*sets the file position to the beginning of the assembly file*/
-    rewind(fp);
-    
-    if (EC>0)
-    {
-        /*Print all the compile error from ErrorsAssembler and exit*/
-        int i;
-        
-        i=0;
-        
-        while(i<EC)
+        char objectName [strlen(argv[argCounter])+4];
+        char entryName [strlen(argv[argCounter])+5];
+        char externName[strlen(argv[argCounter])+5];
+
+
+        strcpy(objectName,argv[argCounter]);
+        strcpy(entryName,argv[argCounter]);
+        strcpy(externName,argv[argCounter]);
+
+        strcat(objectName,".ob");
+        strcat(entryName,".ent");
+        strcat(externName,".ext");
+        strcat(argv[argCounter],".as");
+
+        fp = fopen (argv[argCounter], "r");
+        if(!fp)
         {
-            printf("%s\n",ErrorsAssembler[i]);
-            i++;
+            printf("The file name \"%s\" -isn't valid or not found\n",argv[argc]);
+            argCounter++;
+            continue;
+        }
+
+        /*First checking of the assembly*/
+        CommandLineToLinkedList(1);
+
+        /*sets the file position to the beginning of the assembly file*/
+        rewind(fp);
+
+        if (EC>0)
+        {
+            /*Print all the compile error from ErrorsAssembler and exit*/
+            int i;
+
+            i=0;
+
+            while(i<EC)
+            {
+                printf("%s\n",ErrorsAssembler[i]);
+                i++;
+
+            }
+            return 1;
 
         }
-        return 1;
 
-    }
-    
-    /*Second checking of the assembly*/
-    symbolType_to_entry=(int *)malloc(sizeof(int)*SC);
-    SymbolEntry=0;
-    Total_IC=IC;
-    IC=0;
-    LC=0;
-    CommandLineToLinkedList(2);
-    free(symbolType_to_entry);
-    
-    if (EC>0)
-    {
-        /*Print all the compile error from ErrorsAssembler and exit*/
-        int i;
-        
-        i=0;
-        
-        while(i<EC)
+        /*Second checking of the assembly*/
+        symbolType_to_entry=(int *)malloc(sizeof(int)*SC);
+        Total_IC=IC;
+        IC=0;
+        LC=0;
+        CommandLineToLinkedList(2);
+
+        if (EC>0)
         {
-            printf("%s\n",ErrorsAssembler[i]);
-            i++;
+            /*Print all the compile error from ErrorsAssembler and exit*/
+            int i;
 
+            i=0;
+
+            while(i<EC)
+            {
+                printf("%s\n",ErrorsAssembler[i]);
+                i++;
+
+            }
+            return 2;
         }
-        return 2;
+
+        fclose(fp);
+        objectFile = fopen(objectName, "w");
+
+        if(!fp)
+        {
+            fprintf(stderr,"Can't write the object file\n");
+            exit(0);
+        }
+
+
+        printInstructionsToFile(objectFile);
+        printDataToFile(objectFile);
+        fclose(objectFile);
+
+        if(SymbolEntry>0)
+        {
+            int i;
+            char *addr;
+            char *label;
+
+            i=0;
+            entryFile=fopen(entryName,"w");
+            while(i<SymbolEntry)
+            {
+                label=symbol_table[symbolType_to_entry[i]]->label_name;
+
+                if(((symbol_table[symbolType_to_entry[i]]->type)>=16)&&((symbol_table[symbolType_to_entry[i]]->type)>=18))
+                    addr=base4((symbol_table[symbolType_to_entry[i]]->dec_value)+100+IC,4);
+                else
+                    addr=base4((symbol_table[symbolType_to_entry[i]]->dec_value)+100,4);
+
+                fprintf(entryFile,"%s    %s\n",label,addr);
+                i++;
+            }
+
+            fclose(entryFile);
+            free(addr);
+            free(label);
+        }
+
+        if(SymbolExtern>0)
+        {
+            int i;
+            char *addr;
+            char *label;
+
+            i=0;
+            externFile=fopen(externName,"w");
+            while(i<SymbolExtern)
+            {
+                label=(ExternSy*)ExterSymbols[i]->label_name;
+                addr=base4(((ExternSy*)ExterSymbols[i]->addr)+100,4);
+                fprintf(externFile,"%s    %s\n",addr,label);
+                i++;
+            }
+            fclose(externFile);
+            free(addr);
+            free(label);
+        }
+
+        cleanAllmem();
+        argCounter++;
     }
 
-	/*
-	i = 0;
-	output = fopen("output.txt", "w");
-	while (i < IC)
-	{
-		char ans[6] = "";
-		addr = base4(IC,5);
-
-		if ((instructions_table[i]->type_order) == 0)
-		{
-
-			temp = base4(((InstructOrder *)instructions_table[i]->order)->type_coding,1);
-			strcat(ans, temp);
-			free(temp);
-			temp = base4(((InstructOrder *)instructions_table[i]->order)->origin_addressing,1);
-			strcat(ans, temp);
-			free(temp);
-			temp = base4(((InstructOrder *)instructions_table[i]->order)->dest_addressing,1);
-			strcat(ans, temp);
-			free(temp);
-			temp = base4(((InstructOrder *)instructions_table[i]->order)->opcode,2);
-			strcat(ans, temp);
-			free(temp);
-		}
-		if ((instructions_table[i]->type_order) == 1)
-		{
-			temp = base4(((InstructData*)instructions_table[i]->order)->type_coding,1);
-			strcat(ans, temp);
-			free(temp);
-			temp = base4(((InstructData*)instructions_table[i]->type_order)->value,4);
-			strcat(ans, temp);
-			free(temp);
-		}
-		if ((instructions_table[i]->type_order) == 2)
-		{
-			strcat(ans, "a");
-			temp = base4(((InstructRegisters*)instructions_table[i]->order)->reg2,2);
-			strcat(ans, temp);
-			free(temp);
-			temp = base4(((InstructRegisters*)instructions_table[i]->type_order)->reg1,2);
-			strcat(ans, temp);
-			free(temp);
-		}
-
-		fprintf(output, "%s    %s", addr, value);
-		i++;
-	}
-	*/
-
-
-
-
-
     
+
+
     return 0;
-    
-    
-    
     
 }
 

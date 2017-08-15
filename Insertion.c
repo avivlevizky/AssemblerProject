@@ -143,12 +143,11 @@ void insertToItForOperand(char * data, int operand, int isOriginOperand)
 		regOrder.reg2 = (*isNumeric((mat_data[2] + 1)));
         
 		/*allocate new place registers coding*/
-		InstructOrder *testo = (InstructOrder *)(instructions_table[0]->order);
 		createNewSpaceToITtable(3);
 		*(((InstructRegisters *)(instructions_table[IC]->order))) = regOrder;
 		instructions_table[IC]->type_order = 2;
 		IC++;
-		freeLinkedList(mat_data, 3);
+		freeLinkedList(mat_data);
 	}
 }
 
@@ -172,14 +171,35 @@ void insertToItForOperandSecond(char * data, int operand)
 		{
 			InstructData *temp;
 
-			temp = ((InstructData*)(instructions_table[IC]->order));
+			temp = ((InstructData *) (instructions_table[IC]->order));
 			temp->value = (symbol_table[index]->dec_value) + Total_IC;
 
 			if ((symbol_table[index]->type) == EXTERN)
 			{
 				temp->value = 0;
 				temp->type_coding = 1;
+
+				if (!ExterSymbols)
+				{
+					ExterSymbols = (ExternSy **) malloc(sizeof(ExternSy*));
+					allocate_check(ExterSymbols);
+				}
+				else
+				{
+					ExternSy **temp_table;
+					temp_table = (ExternSy **) realloc(ExterSymbols, sizeof(ExternSy*) * (SymbolExtern + 1));
+					allocate_check(temp_table);
+					ExterSymbols = temp_table;
+				}
+				ExterSymbols[SymbolExtern]=(ExternSy*) malloc(sizeof(ExternSy));
+				allocate_check(ExterSymbols);
+				ExterSymbols[SymbolExtern]->label_name=(char *)calloc(strlen(symbol_table[index]->label_name),sizeof(char));
+				allocate_check(ExterSymbols[SymbolExtern]->label_name);
+				strcpy(ExterSymbols[SymbolExtern]->label_name,symbol_table[index]->label_name);
+				ExterSymbols[SymbolExtern]->addr = IC-1;
+				SymbolExtern++;
 			}
+
 			else
 				temp->type_coding = 2;
 		}
@@ -204,6 +224,12 @@ void insertSymbolToTable(char *data, int type)
 {
 	int isDotDot;
 	Symbol* temp;
+
+	if(!data)
+	{
+		insertNewError("Invalid instruction command in Line: %d");
+		return;
+	}
 
 	isDotDot = 0;
 	if (data[strlen(data) - 1] == ':')
@@ -248,56 +274,96 @@ void insertSymbolToTable(char *data, int type)
 
 
 
-
-
-
-
-/* Function that insert the given data into the instructions_table, the function will update too the IC counter by matching to the length of the given data */
-void FirstCheckingCommand(char ** command)
+void insertToIT(char **data, int Instruc_type)
 {
-	int flag_symbol_type;
+	int orgOperand, destOperand;
+	InstructOrder order;
 
-	/*if the given string list is null/empty */
-	if (!(*command))
+	destOperand = -2;
+	orgOperand = checkAddressingType(data[0]);
+	if (orgOperand != -2)
+		destOperand = checkAddressingType(data[1]);
+
+
+	if ((orgOperand == -1) || (destOperand == -1))
+	{
+	Failure: insertNewError("Invalid operands in Line: %d");
 		return;
-    
-	/*In the case that the first string on the current command line is a label(symbol) */
-	if ((isValidLabel((command[0]), 1)) && (((flag_symbol_type = isInstruction(command[1], 1)) >= 0)))
+	}
+
+	/*if the instruct type is dual places*/
+	if ((Instruc_type <= SUB) || (Instruc_type == LEA))
 	{
-		/*if the instrct type is an data or extern*/
-		if (((flag_symbol_type >= DATA) && (flag_symbol_type <= MAT)) || (flag_symbol_type == EXTERN))
+		if ((orgOperand == -2) || (destOperand == -2))
+			goto Failure;
+
+		if (Instruc_type == LEA)
 		{
-			insertSymbolToTable(command[0], flag_symbol_type);
-			insertToDT(&command[2], flag_symbol_type);
+			if ((orgOperand == 0) || (orgOperand == 3))
+				goto Failure;
 		}
-		/*if the instrct type is an instruction*/
-		else if (flag_symbol_type <= 15)
+		else
 		{
-			insertSymbolToTable(command[0], flag_symbol_type);
-			insertToIT(&command[2], flag_symbol_type);   /*the command[2] is first operand*/
+			if ((Instruc_type != CMP) && (destOperand == 0))
+				goto Failure;
 		}
 	}
-	else /*if the commands[0] isn't label*/
-	{
-		if ((flag_symbol_type = isInstruction(command[0], 0)) >= 0)
+
+	else
+	{   /*if the instruct type is sole place*/
+		if (((Instruc_type >= NOT) && (Instruc_type <= CLR)) || ((Instruc_type >= INC) && (Instruc_type <= JSR)))
 		{
-			if ((flag_symbol_type >= DATA) && (flag_symbol_type <= MAT))
-			{
-				insertToDT(&command[1], flag_symbol_type);
-				return;
-			}
-			if (flag_symbol_type >= 19)
-			{
-				if (flag_symbol_type == 20) /*if is .extern insruct type then we will enter the command into the symbol table*/
-					insertSymbolToTable(command[1], flag_symbol_type);
-			}
-			else
-				insertToIT(&command[1], flag_symbol_type);  /*the command[1] is first operand*/
+			if ((orgOperand == -2) || (destOperand != -2))
+				goto Failure;
+
+			if ((Instruc_type != PRN) && (destOperand == 0))
+				goto Failure;
 		}
-		else if (!isValidLabel((command[0]), 1))
-			    insertNewError("Unidentified command line: %d");
+		else  /*In the condition of Instruc_type==rts or Instruc_type==stop */
+		{
+			if ((orgOperand != -2) || (destOperand != -2))
+				goto Failure;
+		}
 	}
+	/*if the operand/s are valid then: */
+	order.type_coding = 0;
+	order.origin_addressing = (orgOperand == -2) ? 0 : orgOperand;
+	order.dest_addressing = (destOperand == -2) ? 0 : destOperand;
+	order.opcode = Instruc_type;
+
+	createNewSpaceToITtable(1);
+	*(((InstructOrder *)(instructions_table[IC]->order))) = order;
+	instructions_table[IC]->type_order = 0;
+	IC++;
+
+	/*if both of the operands are registers*/
+	if ((orgOperand == 3) && (destOperand == 3))
+	{
+		InstructRegisters regOrder;
+
+		regOrder.reg1 = (*isNumeric(data[0] + 1));
+		regOrder.reg2 = (*isNumeric(data[1] + 1));
+
+		createNewSpaceToITtable(3);
+		*(((InstructRegisters *)(instructions_table[IC]->order))) = regOrder;
+		instructions_table[IC]->type_order = 2;
+		IC++;
+
+	}
+	else
+	{
+		if (orgOperand != -2)
+			insertToItForOperand(data[0], orgOperand, 1);
+
+		if (destOperand != -2)
+			insertToItForOperand(data[1], destOperand, 0);
+	}
+
+
 }
+
+
+
 
 
 
@@ -352,7 +418,11 @@ void insertToDT(char **data, int type)
 		    	{
 			    	if (reader[i + 1])
 			    		insertNewError("The string defining isn't valid in Line: %d");
-				    return;
+
+					CreateNewSpaceForDT();
+					data_table[DC] = '\0';
+					DC++;
+					return;
 			    }
 		    	CreateNewSpaceForDT();
 		    	data_table[DC] = ch;
