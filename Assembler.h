@@ -48,7 +48,7 @@ typedef enum {MOV,CMP,ADD,SUB,NOT,CLR,LEA,INC,DEC,JMP,BNE,RED,PRN,JSR,RTS,STOP,D
 typedef struct
 {
     char * label_name;
-    unsigned int dec_value:8;
+    unsigned dec_value;
     func type;      /*boolean variable: data order or instruction order*/
     
 }Symbol;
