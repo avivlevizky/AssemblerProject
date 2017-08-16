@@ -55,6 +55,8 @@ void createNewSpaceToITtable(int typeOfOrder)
 
 
 
+
+
 /*private function that create/expand the Data table*/
 void CreateNewSpaceForDT()
 {
@@ -72,18 +74,6 @@ void CreateNewSpaceForDT()
 		data_table = temp_data;
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -153,6 +143,11 @@ void insertToItForOperand(char * data, int operand, int isOriginOperand)
 
 
 
+
+
+
+
+
 void insertToItForOperandSecond(char * data, int operand)
 {
 	int index;
@@ -179,25 +174,25 @@ void insertToItForOperandSecond(char * data, int operand)
 				temp->value = 0;
 				temp->type_coding = 1;
 
-				if (!ExterSymbols)
+				if (!ExtSymbolsTable)
 				{
-					ExterSymbols = (ExternSy **) malloc(sizeof(ExternSy*));
-					allocate_check(ExterSymbols);
+                    ExtSymbolsTable = (ExternSy **) malloc(sizeof(ExternSy*));
+					allocate_check(ExtSymbolsTable);
 				}
 				else
 				{
 					ExternSy **temp_table;
-					temp_table = (ExternSy **) realloc(ExterSymbols, sizeof(ExternSy*) * (SymbolExtern + 1));
+					temp_table = (ExternSy **) realloc(ExtSymbolsTable, sizeof(ExternSy*) * (SymbolExtCount + 1));
 					allocate_check(temp_table);
-					ExterSymbols = temp_table;
+                    ExtSymbolsTable = temp_table;
 				}
-				ExterSymbols[SymbolExtern]=(ExternSy*) malloc(sizeof(ExternSy));
-				allocate_check(ExterSymbols);
-				ExterSymbols[SymbolExtern]->label_name=(char *)calloc(strlen(symbol_table[index]->label_name),sizeof(char));
-				allocate_check(ExterSymbols[SymbolExtern]->label_name);
-				strcpy(ExterSymbols[SymbolExtern]->label_name,symbol_table[index]->label_name);
-				ExterSymbols[SymbolExtern]->addr = IC-1;
-				SymbolExtern++;
+                ExtSymbolsTable[SymbolExtCount]=(ExternSy*) malloc(sizeof(ExternSy));
+				allocate_check(ExtSymbolsTable);
+                ExtSymbolsTable[SymbolExtCount]->label_name=(char *)calloc(strlen(symbol_table[index]->label_name)+1,sizeof(char));
+				allocate_check(ExtSymbolsTable[SymbolExtCount]->label_name);
+                strcpy((ExtSymbolsTable[SymbolExtCount]->label_name),(symbol_table[index]->label_name));
+                ExtSymbolsTable[SymbolExtCount]->addr = IC;
+                SymbolExtCount++;
 			}
 
 			else
@@ -238,19 +233,24 @@ void insertSymbolToTable(char *data, int type)
 	temp = (Symbol*)malloc(sizeof(Symbol));
 	allocate_check(temp);
 
-	temp->label_name = (char *)calloc(sizeof(char), strlen(data) - isDotDot);
+	temp->label_name = (char *)calloc(strlen(data)-isDotDot+1,sizeof(char));
 	allocate_check((temp->label_name));
 
-	strcpy(temp->label_name, data);
+	strncpy(temp->label_name, data,strlen(data)-isDotDot);
 	/*need to add check for the copy operation*/
 
-	(temp->label_name)[strlen(temp->label_name) - isDotDot] = '\0';
 	temp->type = type;
 
 	if (type == EXTERN)
 		temp->dec_value = 0;
 	else
-		temp->dec_value = DC;
+    {
+        if (type >= DATA)
+            temp->dec_value = DC;
+        else
+            temp->dec_value = IC;
+    }
+
 
 	if (findSymbol(temp->label_name) != -1) {
 		insertNewError("The symbol is already decleared in Line: %d");
@@ -271,6 +271,11 @@ void insertSymbolToTable(char *data, int type)
 	symbol_table[SC] = temp;
 	SC++;
 }
+
+
+
+
+
 
 
 
@@ -358,6 +363,11 @@ void insertToIT(char **data, int Instruc_type)
 		if (destOperand != -2)
 			insertToItForOperand(data[1], destOperand, 0);
 	}
+
+
+    if(IC+DC>255)
+        fprintf(stderr,"No enough Memory for the given Assembly file\n");
+
 
 
 }
@@ -465,7 +475,15 @@ void insertToDT(char **data, int type)
     	}
     	break;
    	}
+
+
+    if(IC+DC>255)
+        fprintf(stderr,"No enough Memory for the given Assembly file\n");
 }
+
+
+
+
 
 
 

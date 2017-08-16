@@ -12,10 +12,10 @@ Symbol ** symbol_table;               /*The symbols table*/
 Instruction ** instructions_table;   /* for data and instruction order*/
 char ** ErrorsAssembler;     /*Error in the compiling*/
 int * data_table;             /*Int dynamic array to store all the data instructions*/
-int * symbolType_to_entry;             /*table that save all the indexes of the entrys labels*/
-ExternSy ** ExterSymbols;             /*table that save all the indexes of the externs labels*/
-unsigned SymbolEntry;                 /*entry symbols counter*/
-unsigned SymbolExtern;                 /*extern symbols counter*/
+EntrySy ** EntSymbolsTable;             /*table that save all the indexes of the entrys labels*/
+ExternSy ** ExtSymbolsTable;             /*table that save all the indexes of the externs labels*/
+unsigned SymbolEntCount;                 /*entry symbols counter*/
+unsigned SymbolExtCount;                 /*extern symbols counter*/
 unsigned IC;                 /*Instruction table counter*/
 unsigned Total_IC;           /*total of Instructions after the first iteration*/
 unsigned DC;                 /*Data table counter*/
@@ -129,6 +129,8 @@ Loop: while (((reader = fgetc(fp)) != EOF) && (reader != '\n'))
 {
 	if ((reader == ';') && (!word_counter) && (chars_len == 1))
 		ignore = 1;
+
+
 	if ((!ignore) && ((!isspace(reader)) && ((reader != ',') || (isComa))))
 	{
 		char * temp;
@@ -191,13 +193,13 @@ Loop: while (((reader = fgetc(fp)) != EOF) && (reader != '\n'))
 			  FirstCheckingCommand(command);
 		  else
 		  {
-              int counterEntry;
+              unsigned counterEntry;
               counterEntry=0;
 			  SecondCheckingCommand(command);
-			  while ((!EC)&&(counterEntry<SymbolEntry))
+			  while ((!EC)&&(counterEntry<SymbolEntCount))
 			  {
-				  int index;
-				  index = symbolType_to_entry[counterEntry];
+                  unsigned index;
+				  index = EntSymbolsTable[counterEntry]->index;
 				  symbol_table[index]->type = ENTRY;
                   counterEntry++;
 			  }
@@ -259,6 +261,7 @@ void FirstCheckingCommand(char ** command)
 			{
 				if (flag_symbol_type == 20) /*if is .extern insruct type then we will enter the command into the symbol table*/
                     insertSymbolToTable(command[1], flag_symbol_type);
+
 			}
 			else
 			{
@@ -294,7 +297,7 @@ void SecondCheckingCommand(char ** command)
 	if ((flag_symbol_type = isInstruction(command[flag], 1)) == 19)
 	{
 		/*In the case that the second string is .entry*/
-		int index;
+        unsigned index;
 
 		index = findSymbol(command[flag + 1]);
 
@@ -302,8 +305,23 @@ void SecondCheckingCommand(char ** command)
 			insertNewError("The entry symbol defining isn't valid: %d");
 		else
 		{
-			symbolType_to_entry[SymbolEntry] = index;
-			SymbolEntry++;
+            if(!SymbolEntCount)
+            {
+                EntSymbolsTable=(EntrySy **)malloc(sizeof(EntrySy*));
+                allocate_check(EntSymbolsTable);
+            }
+            else
+            {
+                EntrySy ** temp;
+                temp=(EntrySy **)realloc(EntSymbolsTable,SymbolEntCount+1);
+                allocate_check(temp);
+                EntSymbolsTable=temp;
+            }
+            EntSymbolsTable[SymbolEntCount]=(EntrySy *)malloc(sizeof(EntrySy));
+            allocate_check(EntSymbolsTable[SymbolEntCount]);
+            EntSymbolsTable[SymbolEntCount]->index = index;
+            EntSymbolsTable[SymbolEntCount]->type = symbol_table[index]->type;
+            SymbolEntCount++;
 		}
 	}
 	else if (flag_symbol_type <= 15)
@@ -496,14 +514,23 @@ void cleanAllmem()
     free(instructions_table);
     i=0;
 
-    while(i<SymbolExtern)
+    while(i<SymbolExtCount)
     {
-        free(ExterSymbols[i]->label_name);
-        free(ExterSymbols[i]);
+        free(ExtSymbolsTable[i]->label_name);
+        free(ExtSymbolsTable[i]);
         i++;
     }
-    free(ExterSymbols);
+    free(ExtSymbolsTable);
 
+
+    i=0;
+
+    while(i<SymbolEntCount)
+    {
+        free(EntSymbolsTable[i]);
+        i++;
+    }
+    free(EntSymbolsTable);
 
 
 
@@ -511,12 +538,11 @@ void cleanAllmem()
 
     free(data_table);
 
-    free(symbolType_to_entry);
 
 
 
-    SymbolExtern=0;
-    SymbolEntry=0;
+    SymbolEntCount=0;
+    SymbolExtCount=0;
     IC=0;
     SC=0;
     EC=0;
@@ -543,15 +569,9 @@ int main(int argc,char ** argv) {
     FILE * entryFile;
     FILE * externFile;
 
-    SymbolExtern=0;
-    SymbolEntry=0;
-    IC=0;
-    SC=0;
-    EC=0;
-    LC=0;
-    DC=0;
-    argCounter=1;
+    cleanAllmem();
 
+    argCounter=1;
 
     if(argc<2)
         fprintf(stderr,"No entered .as file name\n");
@@ -604,7 +624,6 @@ int main(int argc,char ** argv) {
         }
 
         /*Second checking of the assembly*/
-        symbolType_to_entry=(int *)malloc(sizeof(int)*SC);
         Total_IC=IC;
         IC=0;
         LC=0;
@@ -640,22 +659,23 @@ int main(int argc,char ** argv) {
         printDataToFile(objectFile);
         fclose(objectFile);
 
-        if(SymbolEntry>0)
+        if(SymbolEntCount>0)
         {
-            int i;
+            unsigned i,index;
             char *addr;
             char *label;
 
             i=0;
             entryFile=fopen(entryName,"w");
-            while(i<SymbolEntry)
+            while(i<SymbolEntCount)
             {
-                label=symbol_table[symbolType_to_entry[i]]->label_name;
+                index=EntSymbolsTable[i]->index;
+                label=symbol_table[index]->label_name;
 
-                if(((symbol_table[symbolType_to_entry[i]]->type)>=16)&&((symbol_table[symbolType_to_entry[i]]->type)>=18))
-                    addr=base4((symbol_table[symbolType_to_entry[i]]->dec_value)+100+IC,4);
+                if(((EntSymbolsTable[i]->type)>=16)&&((EntSymbolsTable[i]->type)<=18))
+                    addr=base4((symbol_table[index]->dec_value)+100+IC,4);
                 else
-                    addr=base4((symbol_table[symbolType_to_entry[i]]->dec_value)+100,4);
+                    addr=base4((symbol_table[index]->dec_value)+100,4);
 
                 fprintf(entryFile,"%s    %s\n",label,addr);
                 i++;
@@ -666,7 +686,7 @@ int main(int argc,char ** argv) {
             free(label);
         }
 
-        if(SymbolExtern>0)
+        if(SymbolExtCount>0)
         {
             int i;
             char *addr;
@@ -674,11 +694,11 @@ int main(int argc,char ** argv) {
 
             i=0;
             externFile=fopen(externName,"w");
-            while(i<SymbolExtern)
+            while(i<SymbolExtCount)
             {
-                label=(ExternSy*)ExterSymbols[i]->label_name;
-                addr=base4(((ExternSy*)ExterSymbols[i]->addr)+100,4);
-                fprintf(externFile,"%s    %s\n",addr,label);
+                label=(ExternSy*)ExtSymbolsTable[i]->label_name;
+                addr=base4((ExtSymbolsTable[i])->addr+100,4);
+                fprintf(externFile,"%s    %s\n",label,addr);
                 i++;
             }
             fclose(externFile);

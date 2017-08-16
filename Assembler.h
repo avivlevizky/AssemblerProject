@@ -24,7 +24,7 @@ typedef struct
 
 typedef struct
 {
-    char value: 8;
+    char value;
     unsigned int type_coding: 2;
 }InstructData;
 
@@ -58,10 +58,17 @@ typedef struct
 typedef struct
 {
     char * label_name;
-    int addr;
+    unsigned addr;
 
 }ExternSy;
 
+
+typedef struct
+{
+    unsigned index;
+    func type;
+
+}EntrySy;
 
 
 
@@ -77,7 +84,7 @@ void freeLinkedList(char ** list);
 /*-------------------------------------------Defining Global Variables-------------------------------------------*/
 
 
-ExternSy ** ExterSymbols;             /*table that save all the indexes of the externs labels*/
+ExternSy ** ExtSymbolsTable;             /*table that save all the indexes of the externs labels*/
 Symbol ** symbol_table;               /*The symbols table*/
 int * data_table;             /*Int dynamic array to store all the data instructions*/
 Instruction ** instructions_table;   /* for data and instruction order*/
@@ -87,7 +94,7 @@ unsigned EC;                 /*Error counter*/
 unsigned LC;                 /*Line counter*/
 unsigned DC;                 /*Data table counter*/
 unsigned Total_IC;           /*total of Instructions after the first iteration*/
-unsigned SymbolExtern;
+unsigned SymbolExtCount;
 
 
 
